@@ -51,7 +51,7 @@ class BitsUtils
 				bs = bs_read(bs);
 			}
 			uns_buf = (int) (bs.buf[bs.buf_index] & 0xff);
-			bs.sr = bs.sr | (uns_buf << bs.bc); // values in buffer must be unsigned
+			bs.sr = bs.sr | ((long)uns_buf << bs.bc); // values in buffer must be unsigned
 			
 			bs.sr = bs.sr & 0xFFFFFFFFL;        // sr is an unsigned 32 bit variable
 			

@@ -294,7 +294,6 @@ class WordsUtils
 		
 		for (csamples = 0; csamples < nsamples; ++csamples)
 		{
-			
 			long ones_count, low, high, mid;
 			
 			if ((flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
@@ -318,7 +317,7 @@ class WordsUtils
 					
 					if (w.zeros_acc > 0)
 					{
-						c[entidx].slow_level -= ((c[entidx].slow_level + SLO) >> SLS);
+						c[entidx].slow_level -= (c[entidx].slow_level + SLO) >> SLS;
 						buffer[buffer_counter] = 0;
 						buffer_counter++;
 						continue;
@@ -335,7 +334,6 @@ class WordsUtils
 						w.zeros_acc = cbits;
 					else
 					{
-						
 						--cbits;
 						
 						for (mask = 1, w.zeros_acc = 0; cbits > 0; mask <<= 1)
@@ -380,10 +378,10 @@ class WordsUtils
 					
 					if (bs.ptr == bs.end)
 						bs = BitsUtils.bs_read(bs);
+
+					uns_buf = bs.buf[bs.buf_index] & 0xff;
 					
-					uns_buf = (int) (bs.buf[bs.buf_index] & 0xff);
-					
-					bs.sr = bs.sr | (uns_buf << bs.bc); // values in buffer must be unsigned
+					bs.sr = bs.sr | ((long)uns_buf << bs.bc); // values in buffer must be unsigned
 					
 					next8 = (int)(bs.sr & 0xff);
 					
@@ -394,7 +392,6 @@ class WordsUtils
 				
 				if (next8 == 0xff)
 				{
-					
 					bs.bc -= 8;
 					bs.sr >>= 8;
 
