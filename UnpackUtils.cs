@@ -310,12 +310,9 @@ class UnpackUtils
 		if (bytecnt != 4)
 			return Defines.FALSE; // should also return 0
 		
-		wps.int32_sent_bits = byteptr[counter];
-		counter++;
-		wps.int32_zeros = byteptr[counter];
-		counter++;
-		wps.int32_ones = byteptr[counter];
-		counter++;
+		wps.int32_sent_bits = byteptr[counter++];
+		wps.int32_zeros = byteptr[counter++];
+		wps.int32_ones = byteptr[counter++];
 		wps.int32_dups = byteptr[counter];
 		
 		return Defines.TRUE;
@@ -336,13 +333,11 @@ class UnpackUtils
 		if (bytecnt == 0 || bytecnt > 5)
 			return Defines.FALSE;
 		
-		wpc.config.num_channels = byteptr[counter];
-		counter++;
+		wpc.config.num_channels = byteptr[counter++];
 		
 		while (bytecnt >= 0)
 		{
-			mask |= (long) ((byteptr[counter] & 0xFF) << shift);
-			counter++;
+			mask |= (long) ((byteptr[counter++] & 0xFF) << shift);
 			shift += 8;
 			bytecnt--;
 		}
@@ -363,10 +358,8 @@ class UnpackUtils
 		if (bytecnt >= 3)
 		{
 			wpc.config.flags &= 0xff;
-			wpc.config.flags |= (long) ((byteptr[counter] & 0xFF) << 8);
-			counter++;
-			wpc.config.flags |= (long) ((byteptr[counter] & 0xFF) << 16);
-			counter++;
+			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 8);
+			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 16);
 			wpc.config.flags |= (long) ((byteptr[counter] & 0xFF) << 24);
 		}
 		
@@ -383,10 +376,8 @@ class UnpackUtils
 		
 		if (bytecnt == 3)
 		{
-			wpc.config.sample_rate = (long) (byteptr[counter] & 0xFF);
-			counter++;
-			wpc.config.sample_rate |= (long) ((byteptr[counter] & 0xFF) << 8);
-			counter++;
+			wpc.config.sample_rate = (long) (byteptr[counter++] & 0xFF);
+			wpc.config.sample_rate |= (long) ((byteptr[counter++] & 0xFF) << 8);
 			wpc.config.sample_rate |= (long) ((byteptr[counter] & 0xFF) << 16);
 		}
 		

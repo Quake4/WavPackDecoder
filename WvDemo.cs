@@ -44,7 +44,7 @@ public class WvDemo
 		sbyte[] myDataChunkHeaderAsByteArray = new sbyte[8];
 		
 		long total_unpacked_samples = 0, total_samples; // was uint32_t in C
-		int num_channels, bps;
+		int num_channels, bps, bits;
 		WavpackContext wpc = new WavpackContext();
 		System.IO.FileStream fistream = null;
 		System.IO.BinaryReader reader;
@@ -83,18 +83,21 @@ public class WvDemo
 			System.Console.Error.WriteLine(wpc.error_message);
 			System.Environment.Exit(1);
 		}
-		
+
+		System.Console.Out.WriteLine("The WavPack file has:");
+
 		num_channels = WavPackUtils.WavpackGetReducedChannels(wpc);
 		
-		System.Console.Out.WriteLine("The WavPack file has " + num_channels + " channels");
-		
+		System.Console.Out.WriteLine(num_channels + " channels");
+
+		bps = WavPackUtils.WavpackGetBytesPerSample(wpc);
+		bits = WavPackUtils.WavpackGetBitsPerSample(wpc);
+
+		System.Console.Out.WriteLine(bits + " bits per sample");
+
 		total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		
-		System.Console.Out.WriteLine("The WavPack file has " + total_samples + " samples");
-		
-		bps = WavPackUtils.WavpackGetBytesPerSample(wpc);
-		
-		System.Console.Out.WriteLine("The WavPack file has " + bps + " bytes per sample");
+		System.Console.Out.WriteLine(total_samples + " samples");
 		
 		myRiffChunkHeader.ckID[0] = 'R';
 		myRiffChunkHeader.ckID[1] = 'I';
@@ -119,7 +122,7 @@ public class WvDemo
 		WaveHeader.SampleRate = WavPackUtils.WavpackGetSampleRate(wpc);
 		WaveHeader.BlockAlign = num_channels * bps;
 		WaveHeader.BytesPerSecond = WaveHeader.SampleRate * WaveHeader.BlockAlign;
-		WaveHeader.BitsPerSample = WavPackUtils.WavpackGetBitsPerSample(wpc);
+		WaveHeader.BitsPerSample = bits;
 		
 		DataChunkHeader.ckID[0] = 'd';
 		DataChunkHeader.ckID[1] = 'a';
