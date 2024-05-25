@@ -41,7 +41,7 @@ class BitsUtils
 		int uns_buf;
 		long retval;
 		
-		while ((nbits) > bs.bc)
+		while (nbits > bs.bc)
 		{
 			bs.ptr++;
 			bs.buf_index++;
@@ -50,7 +50,7 @@ class BitsUtils
 			{
 				bs = bs_read(bs);
 			}
-			uns_buf = (int) (bs.buf[bs.buf_index] & 0xff);
+			uns_buf = bs.buf[bs.buf_index] & 0xff;
 			bs.sr = bs.sr | ((long)uns_buf << bs.bc); // values in buffer must be unsigned
 			
 			bs.sr = bs.sr & 0xFFFFFFFFL;        // sr is an unsigned 32 bit variable
@@ -62,13 +62,13 @@ class BitsUtils
 		
 		if (bs.bc > 32)
 		{
-			bs.bc -= (nbits);
+			bs.bc -= nbits;
 			bs.sr = (bs.buf[bs.buf_index] & 0xff) >> (8 - bs.bc);
 		}
 		else
 		{
-			bs.bc -= (nbits);
-			bs.sr >>= (nbits);
+			bs.bc -= nbits;
+			bs.sr >>= nbits;
 		}
 		
 		return (retval);
@@ -94,8 +94,8 @@ class BitsUtils
 		else
 		{
 			/* Strange to set an index to -1, but the very first call to getbit will iterate this */
-			bs.buf_index = - 1;
-			bs.ptr = (short) (- 1);
+			bs.buf_index = -1;
+			bs.ptr = -1;
 		}
 		
 		return bs;
@@ -115,7 +115,7 @@ class BitsUtils
 
 			try
 			{
-				bytes_read   = bs.file.BaseStream.Read(bs.buf, 0, bytes_to_read);
+				bytes_read = bs.file.BaseStream.Read(bs.buf, 0, bytes_to_read);
 
 				bs.buf_index = 0;
 			}
@@ -148,7 +148,6 @@ class BitsUtils
 				bs.buf[i] = unchecked((byte)-1);
 			}
 		}
-		
 		
 		bs.ptr = 0;
 		bs.buf_index = 0;

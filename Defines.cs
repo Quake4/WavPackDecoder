@@ -16,7 +16,7 @@ public class Defines
 	
 	internal static int SAMPLE_BUFFER_SIZE = 256;
 	
-	internal static int BITSTREAM_BUFFER_SIZE = 1024;
+	internal static int BITSTREAM_BUFFER_SIZE = 16 * 1024;
 	
 	internal static int FALSE = 0;
 	internal static int TRUE = 1;

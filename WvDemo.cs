@@ -1,4 +1,3 @@
-using System;
 /*
 ** WvDemo.cs
 **
@@ -32,8 +31,8 @@ public class WvDemo
 	}
 	*/
 	
-	[STAThread]
-	public static void  Main(System.String[] args)
+	[System.STAThread]
+	public static void  Main(string[] args)
 	{
 		ChunkHeader FormatChunkHeader = new ChunkHeader();
 		ChunkHeader DataChunkHeader = new ChunkHeader();
@@ -48,7 +47,7 @@ public class WvDemo
 		int num_channels, bps;
 		WavpackContext wpc = new WavpackContext();
 		System.IO.FileStream fistream = null;
-		System.IO.BinaryReader in_Renamed;
+		System.IO.BinaryReader reader;
 		
 		System.String inputWVFile;
 
@@ -63,10 +62,9 @@ public class WvDemo
 		
 		try
 		{
-            fistream = new System.IO.FileStream(inputWVFile, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-			System.IO.BufferedStream bstream = new System.IO.BufferedStream(fistream,16384); 
-			in_Renamed = new System.IO.BinaryReader(bstream);
-			wpc = WavPackUtils.WavpackOpenFileInput(in_Renamed);
+			fistream = System.IO.File.OpenRead(inputWVFile);
+			reader = new System.IO.BinaryReader(fistream);
+			wpc = WavPackUtils.WavpackOpenFileInput(reader);
 		}
 		catch (System.IO.FileNotFoundException)
 		{
@@ -79,7 +77,7 @@ public class WvDemo
 			System.Environment.Exit(1);
 		}
 		
-		if (wpc.error)
+		if (!string.IsNullOrEmpty(wpc.error_message))
 		{
 			System.Console.Error.WriteLine("Sorry an error has occured");
 			System.Console.Error.WriteLine(wpc.error_message);
@@ -244,7 +242,7 @@ public class WvDemo
 		catch (System.Exception e)
 		{
 			System.Console.Error.WriteLine("Error when writing wav file, sorry: ");
-			SupportClass.WriteStackTrace(e, Console.Error);
+			SupportClass.WriteStackTrace(e, System.Console.Error);
 			System.Environment.Exit(1);
 		}
 
@@ -278,7 +276,6 @@ public class WvDemo
 		
 		switch (bps)
 		{
-			
 			case 1: 
 				while (samcnt > 0)
 				{
@@ -286,7 +283,6 @@ public class WvDemo
 					samcnt--;
 				}
 				break;
-			
 			
 			case 2: 
 				while (samcnt > 0)
@@ -301,7 +297,6 @@ public class WvDemo
 				
 				break;
 			
-			
 			case 3: 
 				while (samcnt > 0)
 				{
@@ -314,7 +309,6 @@ public class WvDemo
 				}
 				
 				break;
-			
 			
 			case 4: 
 				while (samcnt > 0)

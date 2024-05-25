@@ -43,35 +43,26 @@ public class WavPackUtils
 		wpc.norm_offset = 0;
 		wpc.open_flags = 0;
 		
-		
 		// open the source file for reading and store the size
-		
 		while (wps.wphdr.block_samples == 0)
 		{
-			
 			wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
 			
 			if (wps.wphdr.status == 1)
 			{
 				wpc.error_message = "not compatible with this version of WavPack file!";
-				wpc.error = true;
-				return (wpc);
+				return wpc;
 			}
 			
 			if (wps.wphdr.block_samples > 0 && wps.wphdr.total_samples != - 1)
-			{
 				wpc.total_samples = wps.wphdr.total_samples;
-			}
 			
 			// lets put the stream back in the context
 			
 			wpc.stream = wps;
 			
-			if ((UnpackUtils.unpack_init(wpc)) == Defines.FALSE)
-			{
-				wpc.error = true;
+			if (UnpackUtils.unpack_init(wpc) == Defines.FALSE)
 				return wpc;
-			}
 		} // end of while
 		
 		wpc.config.flags = wpc.config.flags & ~ 0xff;
@@ -99,13 +90,9 @@ public class WavPackUtils
 		if (wpc.config.num_channels == 0)
 		{
 			if ((wps.wphdr.flags & Defines.MONO_FLAG) > 0)
-			{
 				wpc.config.num_channels = 1;
-			}
 			else
-			{
 				wpc.config.num_channels = 2;
-			}
 			
 			wpc.config.channel_mask = 0x5 - wpc.config.num_channels;
 		}
@@ -113,13 +100,9 @@ public class WavPackUtils
 		if ((wps.wphdr.flags & Defines.FINAL_BLOCK) == 0)
 		{
 			if ((wps.wphdr.flags & Defines.MONO_FLAG) != 0)
-			{
 				wpc.reduced_channels = 1;
-			}
 			else
-			{
 				wpc.reduced_channels = 2;
-			}
 		}
 		
 		return wpc;
@@ -260,7 +243,7 @@ public class WavPackUtils
 				break;
 		}
 		
-		return (samples_unpacked);
+		return samples_unpacked;
 	}
 
 
@@ -311,7 +294,6 @@ public class WavPackUtils
 	
 	
 	// return if any uncorrected lossy blocks were actually written or read
-	
 	
 	internal static int WavpackLossyBlocks(WavpackContext wpc)
 	{
