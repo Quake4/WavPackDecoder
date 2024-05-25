@@ -41,21 +41,12 @@ public class WvDemo
 		sbyte[] myWaveHeaderAsByteArray = new sbyte[16];
 		sbyte[] myDataChunkHeaderAsByteArray = new sbyte[8];
 		
-		long total_unpacked_samples = 0, total_samples; // was uint32_t in C
+		long total_unpacked_samples = 0;
 		WavpackContext wpc = new WavpackContext();
 		System.IO.FileStream fistream = null;
 		System.IO.BinaryReader reader;
 		
-		System.String inputWVFile;
-
-		if (args.Length == 0)
-		{
-			inputWVFile = "input.wv";
-		}
-		else
-		{
-			inputWVFile = args[0];
-		}
+		string inputWVFile = args.Length > 0 ? args[0] : "input.wv";
 		
 		try
 		{
@@ -65,38 +56,32 @@ public class WvDemo
 		}
 		catch (System.IO.FileNotFoundException)
 		{
-			System.Console.Error.WriteLine("Input file not found");
+			System.Console.Error.WriteLine("Input file '" + inputWVFile +"' not found");
 			System.Environment.Exit(1);
 		}
 		catch (System.IO.DirectoryNotFoundException)
 		{
-			System.Console.Error.WriteLine("Input file not found - invalid directory");
+			System.Console.Error.WriteLine("Input file '" + inputWVFile + "' not found - invalid directory");
 			System.Environment.Exit(1);
 		}
 		
 		if (!string.IsNullOrEmpty(wpc.error_message))
 		{
-			System.Console.Error.WriteLine("Sorry an error has occured");
-			System.Console.Error.WriteLine(wpc.error_message);
+			System.Console.Error.WriteLine("Error: " + wpc.error_message);
 			System.Environment.Exit(1);
 		}
 
-		System.Console.Out.WriteLine("The WavPack file has:");
-
 		int num_channels = WavPackUtils.WavpackGetReducedChannels(wpc);
-		
-		System.Console.Out.WriteLine(num_channels + " channels");
-
 		int bits = WavPackUtils.WavpackGetBitsPerSample(wpc);
-
-		System.Console.Out.WriteLine(bits + " bits per sample");
-
-		total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
-		
-		System.Console.Out.WriteLine(total_samples + " samples");
-
 		int byteps = WavPackUtils.WavpackGetBytesPerSample(wpc);
 		int block_align = byteps * num_channels;
+		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
+		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
+
+		System.Console.Out.WriteLine("The WavPack file has:");
+		System.Console.Out.WriteLine(num_channels + " channels");
+		System.Console.Out.WriteLine(bits + " bits per sample");
+		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
 
 		myRiffChunkHeader.ckID[0] = 'R';
 		myRiffChunkHeader.ckID[1] = 'I';
@@ -118,7 +103,7 @@ public class WvDemo
 		
 		WaveHeader.FormatTag = 1;
 		WaveHeader.NumChannels = num_channels;
-		WaveHeader.SampleRate = WavPackUtils.WavpackGetSampleRate(wpc);
+		WaveHeader.SampleRate = sample_rate;
 		WaveHeader.BlockAlign = block_align;
 		WaveHeader.BytesPerSecond = WaveHeader.SampleRate * WaveHeader.BlockAlign;
 		WaveHeader.BitsPerSample = bits;
@@ -217,7 +202,7 @@ public class WvDemo
 
 				while (true)
 				{
-					long samples_unpacked; // was uint32_t in C
+					long samples_unpacked;
 
 					samples_unpacked = WavPackUtils.WavpackUnpackSamples(wpc, temp_buffer, samples_unpack);
 
