@@ -294,7 +294,8 @@ class WordsUtils
 		
 		for (csamples = 0; csamples < nsamples; ++csamples)
 		{
-			long ones_count, low, high, mid;
+			int ones_count;
+			long low, high, mid;
 			
 			if ((flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 			// if not mono
@@ -307,7 +308,6 @@ class WordsUtils
 			
 			if ((w.c[0].median[0] & ~ 1) == 0 && w.holding_zero == 0 && w.holding_one == 0 && (w.c[1].median[0] & ~ 1) == 0)
 			{
-				
 				long mask;
 				int cbits;
 				
@@ -426,8 +426,8 @@ class WordsUtils
 				}
 				else
 				{
-					bs.bc = (int) (bs.bc - ((ones_count = ones_count_table[next8]) + 1));
-					bs.sr = bs.sr >> (int) (ones_count + 1); // needs to be unsigned
+					bs.bc = bs.bc - ((ones_count = ones_count_table[next8]) + 1);
+					bs.sr = bs.sr >> (ones_count + 1); // needs to be unsigned
 				}
 				
 				if (w.holding_one > 0)
