@@ -16,7 +16,6 @@ class Bitstream
 	internal int file_bytes;
 	internal int error, bc;
 	internal System.IO.BinaryReader file;
-	internal int bitval = 0;
 	internal byte[] buf = new byte[Defines.BITSTREAM_BUFFER_SIZE];
 	internal int buf_index = 0;
 }

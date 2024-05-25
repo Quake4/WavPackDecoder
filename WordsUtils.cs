@@ -326,19 +326,10 @@ class WordsUtils
 				}
 				else
 				{
-					cbits = 0;
-					bs = BitsUtils.getbit(bs);
-					
-					while (cbits < 33 && bs.bitval > 0)
-					{
-						cbits++;
-						bs = BitsUtils.getbit(bs);
-					}
+					for (cbits = 0; cbits < 33 && BitsUtils.getbit(bs); ++cbits) ;
 					
 					if (cbits == 33)
-					{
 						break;
-					}
 					
 					if (cbits < 2)
 						w.zeros_acc = cbits;
@@ -349,9 +340,7 @@ class WordsUtils
 						
 						for (mask = 1, w.zeros_acc = 0; cbits > 0; mask <<= 1)
 						{
-							bs = BitsUtils.getbit(bs);
-							
-							if (bs.bitval > 0)
+							if (BitsUtils.getbit(bs))
 								w.zeros_acc |= mask;
 							cbits--;
 						}
@@ -408,51 +397,30 @@ class WordsUtils
 					
 					bs.bc -= 8;
 					bs.sr >>= 8;
-					
-					ones_count = 8;
-					bs = BitsUtils.getbit(bs);
-					
-					while (ones_count < (LIMIT_ONES + 1) && bs.bitval > 0)
-					{
-						ones_count++;
-						bs = BitsUtils.getbit(bs);
-					}
+
+					for (ones_count = 8; ones_count < (LIMIT_ONES + 1) && BitsUtils.getbit(bs); ++ones_count) ;
 					
 					if (ones_count == (LIMIT_ONES + 1))
-					{
 						break;
-					}
 					
 					if (ones_count == LIMIT_ONES)
 					{
 						int mask;
 						int cbits;
-						
-						cbits = 0;
-						bs = BitsUtils.getbit(bs);
-						
-						while (cbits < 33 && bs.bitval > 0)
-						{
-							cbits++;
-							bs = BitsUtils.getbit(bs);
-						}
+
+						for (cbits = 0; cbits < 33 && BitsUtils.getbit(bs); ++cbits) ;
 						
 						if (cbits == 33)
-						{
 							break;
-						}
 						
 						if (cbits < 2)
 							ones_count = cbits;
 						else
 						{
 							for (mask = 1, ones_count = 0; --cbits > 0; mask <<= 1)
-							{
-								bs = BitsUtils.getbit(bs);
-								
-								if (bs.bitval > 0)
+								if (BitsUtils.getbit(bs))
 									ones_count |= mask;
-							}
+
 							ones_count |= mask;
 						}
 						
@@ -537,10 +505,7 @@ class WordsUtils
 			else
 				while (high - low > c[entidx].error_limit)
 				{
-					
-					bs = BitsUtils.getbit(bs);
-					
-					if (bs.bitval > 0)
+					if (BitsUtils.getbit(bs))
 					{
 						mid = (high + (low = mid) + 1) >> 1;
 					}
@@ -550,9 +515,7 @@ class WordsUtils
 					}
 				}
 			
-			bs = BitsUtils.getbit(bs);
-			
-			if (bs.bitval > 0)
+			if (BitsUtils.getbit(bs))
 			{
 				buffer[buffer_counter] = (int) ~ mid;
 			}
@@ -629,13 +592,9 @@ class WordsUtils
 		
 		if (code >= extras)
 		{
-			
 			code = (code << 1) - extras;
 			
-			bs = BitsUtils.getbit(bs);
-			
-			if (bs.bitval > 0)
-
+			if (BitsUtils.getbit(bs))
 				++code;
 		}
 		
@@ -726,9 +685,9 @@ class WordsUtils
 	internal static int restore_weight(sbyte weight)
 	{
 		int result;
-		
-		if ((result = (int) weight << 3) > 0)
-			result += ((result + 64) >> 7);
+
+		if ((result = weight << 3) > 0)
+			result += (result + 64) >> 7;
 		
 		return result;
 	}

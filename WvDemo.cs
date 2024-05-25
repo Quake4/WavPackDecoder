@@ -11,19 +11,26 @@ using System;
 
 public class WvDemo
 {
-	public WvDemo()
-	{
-		InitBlock();
-	}
-	private void  InitBlock()
+	internal static int[] temp_buffer;
+	internal static byte[] pcm_buffer;
+
+	static WvDemo()
 	{
 		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
 		pcm_buffer = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
 	}
-	
-	internal static int[] temp_buffer;
-	
-	internal static byte[] pcm_buffer;
+	/*
+	public WvDemo()
+	{
+		InitBlock();
+	}
+
+	private void InitBlock()
+	{
+		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
+		pcm_buffer = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
+	}
+	*/
 	
 	[STAThread]
 	public static void  Main(System.String[] args)
@@ -40,10 +47,8 @@ public class WvDemo
 		long total_unpacked_samples = 0, total_samples; // was uint32_t in C
 		int num_channels, bps;
 		WavpackContext wpc = new WavpackContext();
-		System.IO.FileStream fistream;
-		System.IO.FileStream fostream;
+		System.IO.FileStream fistream = null;
 		System.IO.BinaryReader in_Renamed;
-		long start, end;
 		
 		System.String inputWVFile;
 
@@ -196,37 +201,45 @@ public class WvDemo
 		
 		try
 		{
-			fostream = new System.IO.FileStream("output.wav", System.IO.FileMode.Create);
-			SupportClass.WriteOutput(fostream, myRiffChunkHeaderAsByteArray);
-			SupportClass.WriteOutput(fostream, myFormatChunkHeaderAsByteArray);
-			SupportClass.WriteOutput(fostream, myWaveHeaderAsByteArray);
-			SupportClass.WriteOutput(fostream, myDataChunkHeaderAsByteArray);
-			
-			start = (System.DateTime.Now.Ticks - 621355968000000000) / 10000;
-			
-			while (true)
+			using (var fostream = new System.IO.FileStream(System.IO.Path.ChangeExtension(inputWVFile, ".wav"), System.IO.FileMode.Create))
 			{
-				long samples_unpacked; // was uint32_t in C
-				
-				samples_unpacked = WavPackUtils.WavpackUnpackSamples(wpc, temp_buffer, Defines.SAMPLE_BUFFER_SIZE / num_channels);
-				
-				total_unpacked_samples += samples_unpacked;
-				
-				if (samples_unpacked > 0)
+				SupportClass.WriteOutput(fostream, myRiffChunkHeaderAsByteArray);
+				SupportClass.WriteOutput(fostream, myFormatChunkHeaderAsByteArray);
+				SupportClass.WriteOutput(fostream, myWaveHeaderAsByteArray);
+				SupportClass.WriteOutput(fostream, myDataChunkHeaderAsByteArray);
+
+				var sw = new System.Diagnostics.Stopwatch();
+				sw.Start();
+
+				var samples_unpack = Defines.SAMPLE_BUFFER_SIZE / num_channels;
+
+				var loop_samples = total_samples / 100 / samples_unpack * samples_unpack;
+
+				while (true)
 				{
-					samples_unpacked = samples_unpacked * num_channels;
-					
-					pcm_buffer = format_samples(bps, temp_buffer, samples_unpacked);
-					fostream.Write(pcm_buffer, 0, (int) samples_unpacked * bps);
-				}
-				
-				if (samples_unpacked == 0)
-					break;
-			} // end of while
-			
-			end = (System.DateTime.Now.Ticks - 621355968000000000) / 10000;
-			
-			System.Console.Out.WriteLine(end - start + " milli seconds to process WavPack file in main loop");
+					long samples_unpacked; // was uint32_t in C
+
+					samples_unpacked = WavPackUtils.WavpackUnpackSamples(wpc, temp_buffer, samples_unpack);
+
+					total_unpacked_samples += samples_unpacked;
+
+					if (samples_unpacked > 0)
+					{
+						samples_unpacked = samples_unpacked * num_channels;
+
+						pcm_buffer = format_samples(bps, temp_buffer, samples_unpacked);
+						fostream.Write(pcm_buffer, 0, (int)samples_unpacked * bps);
+					}
+
+					if (total_unpacked_samples % loop_samples == 0)
+						System.Console.Out.Write("Process: " + total_unpacked_samples * 100 / total_samples + "%\r");
+
+					if (samples_unpacked == 0)
+						break;
+				} // end of while
+
+				System.Console.Out.WriteLine(sw.ElapsedMilliseconds + " milliseconds to process WavPack file in main loop");
+			}
 		}
 		catch (System.Exception e)
 		{
@@ -234,7 +247,9 @@ public class WvDemo
 			SupportClass.WriteStackTrace(e, Console.Error);
 			System.Environment.Exit(1);
 		}
-		
+
+		fistream?.Dispose();
+
 		if ((WavPackUtils.WavpackGetNumSamples(wpc) != - 1) && (total_unpacked_samples != WavPackUtils.WavpackGetNumSamples(wpc)))
 		{
 			System.Console.Error.WriteLine("Incorrect number of samples");
@@ -267,8 +282,7 @@ public class WvDemo
 			case 1: 
 				while (samcnt > 0)
 				{
-					dst[counter] = (byte) (0x00FF & (src[counter] + 128));
-					counter++;
+					dst[counter++] = (byte) (0x00FF & (src[counter] + 128));
 					samcnt--;
 				}
 				break;
@@ -278,11 +292,9 @@ public class WvDemo
 				while (samcnt > 0)
 				{
 					temp = src[counter2];
-					dst[counter] = (byte) temp;
-					counter++;
+					dst[counter++] = (byte) temp;
 					//dst[counter] = (byte) (SupportClass.URShift(temp, 8));
-					dst[counter] = (byte) (temp >> 8);
-					counter++;
+					dst[counter++] = (byte) (temp >> 8);
 					counter2++;
 					samcnt--;
 				}
@@ -294,12 +306,9 @@ public class WvDemo
 				while (samcnt > 0)
 				{
 					temp = src[counter2];
-					dst[counter] = (byte) temp;
-					counter++;
-                    dst[counter] = (byte)(temp >> 8);
-					counter++;
-                    dst[counter] = (byte)(temp >> 16);
-					counter++;
+					dst[counter++] = (byte) temp;
+                    dst[counter++] = (byte)(temp >> 8);
+                    dst[counter++] = (byte)(temp >> 16);
 					counter2++;
 					samcnt--;
 				}
@@ -311,14 +320,10 @@ public class WvDemo
 				while (samcnt > 0)
 				{
 					temp = src[counter2];
-					dst[counter] = (byte) temp;
-					counter++;
-					dst[counter] = (byte) (SupportClass.URShift(temp, 8));
-					counter++;
-					dst[counter] = (byte) (SupportClass.URShift(temp, 16));
-					counter++;
-					dst[counter] = (byte) (SupportClass.URShift(temp, 24));
-					counter++;
+					dst[counter++] = (byte) temp;
+					dst[counter++] = (byte) (SupportClass.URShift(temp, 8));
+					dst[counter++] = (byte) (SupportClass.URShift(temp, 16));
+					dst[counter++] = (byte) (SupportClass.URShift(temp, 24));
 					counter2++;
 					samcnt--;
 				}
@@ -327,10 +332,5 @@ public class WvDemo
 			}
 		
 		return dst;
-	}
-	static WvDemo()
-	{
-		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
-		pcm_buffer = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
 	}
 }

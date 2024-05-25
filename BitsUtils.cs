@@ -11,7 +11,7 @@ using System;
 
 class BitsUtils
 {
-	internal static Bitstream getbit(Bitstream bs)
+	internal static bool getbit(Bitstream bs)
 	{		
 		if (bs.bc > 0)
 		{
@@ -31,9 +31,9 @@ class BitsUtils
 			bs.sr = (bs.buf[bs.buf_index] & 0xff);
 		}
 		
-		bs.bitval =  (int)(bs.sr & 1); 
-        bs.sr = bs.sr >> 1; 
-		return bs;
+		bool result = (bs.sr & 1) > 0;
+        bs.sr >>= 1; 
+		return result;
 	}
 	
 	internal static long getbits(int nbits, Bitstream bs)
