@@ -234,8 +234,6 @@ class MetadataUtils
 						return Defines.FALSE;
 					}
 				}
-				break;
-			
 		}
 	}
 }
