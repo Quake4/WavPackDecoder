@@ -36,10 +36,10 @@ public class WvDemo
 		ChunkHeader DataChunkHeader = new ChunkHeader();
 		RiffChunkHeader myRiffChunkHeader = new RiffChunkHeader();
 		WaveHeader WaveHeader = new WaveHeader();
-		sbyte[] myRiffChunkHeaderAsByteArray = new sbyte[12];
-		sbyte[] myFormatChunkHeaderAsByteArray = new sbyte[8];
-		sbyte[] myWaveHeaderAsByteArray = new sbyte[16];
-		sbyte[] myDataChunkHeaderAsByteArray = new sbyte[8];
+		byte[] myRiffChunkHeaderAsByteArray = new byte[12];
+		byte[] myFormatChunkHeaderAsByteArray = new byte[8];
+		byte[] myWaveHeaderAsByteArray = new byte[16];
+		byte[] myDataChunkHeaderAsByteArray = new byte[8];
 		
 		long total_unpacked_samples = 0;
 		WavpackContext wpc = new WavpackContext();
@@ -114,75 +114,75 @@ public class WvDemo
 		DataChunkHeader.ckID[3] = 'a';
 		DataChunkHeader.ckSize = total_samples * block_align;
 		
-		myRiffChunkHeaderAsByteArray[0] = (sbyte) myRiffChunkHeader.ckID[0];
-		myRiffChunkHeaderAsByteArray[1] = (sbyte) myRiffChunkHeader.ckID[1];
-		myRiffChunkHeaderAsByteArray[2] = (sbyte) myRiffChunkHeader.ckID[2];
-		myRiffChunkHeaderAsByteArray[3] = (sbyte) myRiffChunkHeader.ckID[3];
+		myRiffChunkHeaderAsByteArray[0] = (byte) myRiffChunkHeader.ckID[0];
+		myRiffChunkHeaderAsByteArray[1] = (byte) myRiffChunkHeader.ckID[1];
+		myRiffChunkHeaderAsByteArray[2] = (byte) myRiffChunkHeader.ckID[2];
+		myRiffChunkHeaderAsByteArray[3] = (byte) myRiffChunkHeader.ckID[3];
 		
 		// swap endians here
 		
-		myRiffChunkHeaderAsByteArray[7] = (sbyte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 24));
-		myRiffChunkHeaderAsByteArray[6] = (sbyte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 16));
-		myRiffChunkHeaderAsByteArray[5] = (sbyte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 8));
-		myRiffChunkHeaderAsByteArray[4] = (sbyte) (myRiffChunkHeader.ckSize);
+		myRiffChunkHeaderAsByteArray[7] = (byte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 24));
+		myRiffChunkHeaderAsByteArray[6] = (byte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 16));
+		myRiffChunkHeaderAsByteArray[5] = (byte) (SupportClass.URShift(myRiffChunkHeader.ckSize, 8));
+		myRiffChunkHeaderAsByteArray[4] = (byte) (myRiffChunkHeader.ckSize);
 		
-		myRiffChunkHeaderAsByteArray[8] = (sbyte) myRiffChunkHeader.formType[0];
-		myRiffChunkHeaderAsByteArray[9] = (sbyte) myRiffChunkHeader.formType[1];
-		myRiffChunkHeaderAsByteArray[10] = (sbyte) myRiffChunkHeader.formType[2];
-		myRiffChunkHeaderAsByteArray[11] = (sbyte) myRiffChunkHeader.formType[3];
+		myRiffChunkHeaderAsByteArray[8] = (byte) myRiffChunkHeader.formType[0];
+		myRiffChunkHeaderAsByteArray[9] = (byte) myRiffChunkHeader.formType[1];
+		myRiffChunkHeaderAsByteArray[10] = (byte) myRiffChunkHeader.formType[2];
+		myRiffChunkHeaderAsByteArray[11] = (byte) myRiffChunkHeader.formType[3];
 		
-		myFormatChunkHeaderAsByteArray[0] = (sbyte) FormatChunkHeader.ckID[0];
-		myFormatChunkHeaderAsByteArray[1] = (sbyte) FormatChunkHeader.ckID[1];
-		myFormatChunkHeaderAsByteArray[2] = (sbyte) FormatChunkHeader.ckID[2];
-		myFormatChunkHeaderAsByteArray[3] = (sbyte) FormatChunkHeader.ckID[3];
+		myFormatChunkHeaderAsByteArray[0] = (byte) FormatChunkHeader.ckID[0];
+		myFormatChunkHeaderAsByteArray[1] = (byte) FormatChunkHeader.ckID[1];
+		myFormatChunkHeaderAsByteArray[2] = (byte) FormatChunkHeader.ckID[2];
+		myFormatChunkHeaderAsByteArray[3] = (byte) FormatChunkHeader.ckID[3];
 		
 		// swap endians here
-		myFormatChunkHeaderAsByteArray[7] = (sbyte) (SupportClass.URShift(FormatChunkHeader.ckSize, 24));
-		myFormatChunkHeaderAsByteArray[6] = (sbyte) (SupportClass.URShift(FormatChunkHeader.ckSize, 16));
-		myFormatChunkHeaderAsByteArray[5] = (sbyte) (SupportClass.URShift(FormatChunkHeader.ckSize, 8));
-		myFormatChunkHeaderAsByteArray[4] = (sbyte) (FormatChunkHeader.ckSize);
+		myFormatChunkHeaderAsByteArray[7] = (byte) (SupportClass.URShift(FormatChunkHeader.ckSize, 24));
+		myFormatChunkHeaderAsByteArray[6] = (byte) (SupportClass.URShift(FormatChunkHeader.ckSize, 16));
+		myFormatChunkHeaderAsByteArray[5] = (byte) (SupportClass.URShift(FormatChunkHeader.ckSize, 8));
+		myFormatChunkHeaderAsByteArray[4] = (byte) (FormatChunkHeader.ckSize);
 		
 		// swap endians
-		myWaveHeaderAsByteArray[1] = (sbyte) (SupportClass.URShift(WaveHeader.FormatTag, 8));
-		myWaveHeaderAsByteArray[0] = (sbyte) (WaveHeader.FormatTag);
+		myWaveHeaderAsByteArray[1] = (byte) (SupportClass.URShift(WaveHeader.FormatTag, 8));
+		myWaveHeaderAsByteArray[0] = (byte) (WaveHeader.FormatTag);
 		
 		// swap endians
-		myWaveHeaderAsByteArray[3] = (sbyte) (SupportClass.URShift(WaveHeader.NumChannels, 8));
-		myWaveHeaderAsByteArray[2] = (sbyte) WaveHeader.NumChannels;
+		myWaveHeaderAsByteArray[3] = (byte) (SupportClass.URShift(WaveHeader.NumChannels, 8));
+		myWaveHeaderAsByteArray[2] = (byte) WaveHeader.NumChannels;
 		
 		
 		// swap endians
-		myWaveHeaderAsByteArray[7] = (sbyte) (SupportClass.URShift(WaveHeader.SampleRate, 24));
-		myWaveHeaderAsByteArray[6] = (sbyte) (SupportClass.URShift(WaveHeader.SampleRate, 16));
-		myWaveHeaderAsByteArray[5] = (sbyte) (SupportClass.URShift(WaveHeader.SampleRate, 8));
-		myWaveHeaderAsByteArray[4] = (sbyte) (WaveHeader.SampleRate);
-		
-		// swap endians
-		
-		myWaveHeaderAsByteArray[11] = (sbyte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 24));
-		myWaveHeaderAsByteArray[10] = (sbyte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 16));
-		myWaveHeaderAsByteArray[9] = (sbyte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 8));
-		myWaveHeaderAsByteArray[8] = (sbyte) (WaveHeader.BytesPerSecond);
-		
-		// swap endians
-		myWaveHeaderAsByteArray[13] = (sbyte) (SupportClass.URShift(WaveHeader.BlockAlign, 8));
-		myWaveHeaderAsByteArray[12] = (sbyte) WaveHeader.BlockAlign;
-		
-		// swap endians
-		myWaveHeaderAsByteArray[15] = (sbyte) (SupportClass.URShift(WaveHeader.BitsPerSample, 8));
-		myWaveHeaderAsByteArray[14] = (sbyte) WaveHeader.BitsPerSample;
-		
-		myDataChunkHeaderAsByteArray[0] = (sbyte) DataChunkHeader.ckID[0];
-		myDataChunkHeaderAsByteArray[1] = (sbyte) DataChunkHeader.ckID[1];
-		myDataChunkHeaderAsByteArray[2] = (sbyte) DataChunkHeader.ckID[2];
-		myDataChunkHeaderAsByteArray[3] = (sbyte) DataChunkHeader.ckID[3];
+		myWaveHeaderAsByteArray[7] = (byte) (SupportClass.URShift(WaveHeader.SampleRate, 24));
+		myWaveHeaderAsByteArray[6] = (byte) (SupportClass.URShift(WaveHeader.SampleRate, 16));
+		myWaveHeaderAsByteArray[5] = (byte) (SupportClass.URShift(WaveHeader.SampleRate, 8));
+		myWaveHeaderAsByteArray[4] = (byte) (WaveHeader.SampleRate);
 		
 		// swap endians
 		
-		myDataChunkHeaderAsByteArray[7] = (sbyte) (SupportClass.URShift(DataChunkHeader.ckSize, 24));
-		myDataChunkHeaderAsByteArray[6] = (sbyte) (SupportClass.URShift(DataChunkHeader.ckSize, 16));
-		myDataChunkHeaderAsByteArray[5] = (sbyte) (SupportClass.URShift(DataChunkHeader.ckSize, 8));
-		myDataChunkHeaderAsByteArray[4] = (sbyte) DataChunkHeader.ckSize;
+		myWaveHeaderAsByteArray[11] = (byte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 24));
+		myWaveHeaderAsByteArray[10] = (byte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 16));
+		myWaveHeaderAsByteArray[9] = (byte) (SupportClass.URShift(WaveHeader.BytesPerSecond, 8));
+		myWaveHeaderAsByteArray[8] = (byte) (WaveHeader.BytesPerSecond);
+		
+		// swap endians
+		myWaveHeaderAsByteArray[13] = (byte) (SupportClass.URShift(WaveHeader.BlockAlign, 8));
+		myWaveHeaderAsByteArray[12] = (byte) WaveHeader.BlockAlign;
+		
+		// swap endians
+		myWaveHeaderAsByteArray[15] = (byte) (SupportClass.URShift(WaveHeader.BitsPerSample, 8));
+		myWaveHeaderAsByteArray[14] = (byte) WaveHeader.BitsPerSample;
+		
+		myDataChunkHeaderAsByteArray[0] = (byte) DataChunkHeader.ckID[0];
+		myDataChunkHeaderAsByteArray[1] = (byte) DataChunkHeader.ckID[1];
+		myDataChunkHeaderAsByteArray[2] = (byte) DataChunkHeader.ckID[2];
+		myDataChunkHeaderAsByteArray[3] = (byte) DataChunkHeader.ckID[3];
+		
+		// swap endians
+		
+		myDataChunkHeaderAsByteArray[7] = (byte) (SupportClass.URShift(DataChunkHeader.ckSize, 24));
+		myDataChunkHeaderAsByteArray[6] = (byte) (SupportClass.URShift(DataChunkHeader.ckSize, 16));
+		myDataChunkHeaderAsByteArray[5] = (byte) (SupportClass.URShift(DataChunkHeader.ckSize, 8));
+		myDataChunkHeaderAsByteArray[4] = (byte) DataChunkHeader.ckSize;
 		
 		try
 		{

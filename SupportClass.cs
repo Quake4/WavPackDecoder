@@ -111,61 +111,14 @@ public class SupportClass
 
 	/*******************************/
 	/// <summary>
-	/// Converts an array of sbytes to an array of bytes
-	/// </summary>
-	/// <param name="sbyteArray">The array of sbytes to be converted</param>
-	/// <returns>The new array of bytes</returns>
-	public static byte[] ToByteArray(sbyte[] sbyteArray)
-	{
-		byte[] byteArray = null;
-
-		if (sbyteArray != null)
-		{
-			byteArray = new byte[sbyteArray.Length];
-			for(int index=0; index < sbyteArray.Length; index++)
-				byteArray[index] = (byte) sbyteArray[index];
-		}
-		return byteArray;
-	}
-
-	/// <summary>
-	/// Converts a string to an array of bytes
-	/// </summary>
-	/// <param name="sourceString">The string to be converted</param>
-	/// <returns>The new array of bytes</returns>
-	public static byte[] ToByteArray(System.String sourceString)
-	{
-		return System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
-	}
-
-	/// <summary>
-	/// Converts a array of object-type instances to a byte-type array.
-	/// </summary>
-	/// <param name="tempObjectArray">Array to convert.</param>
-	/// <returns>An array of byte type elements.</returns>
-	public static byte[] ToByteArray(System.Object[] tempObjectArray)
-	{
-		byte[] byteArray = null;
-		if (tempObjectArray != null)
-		{
-			byteArray = new byte[tempObjectArray.Length];
-			for (int index = 0; index < tempObjectArray.Length; index++)
-				byteArray[index] = (byte)tempObjectArray[index];
-		}
-		return byteArray;
-	}
-
-	/*******************************/
-	/// <summary>
 	/// Write an array of bytes int the FileStream specified.
 	/// </summary>
 	/// <param name="FileStreamWrite">FileStream that must be updated.</param>
 	/// <param name="Source">Array of bytes that must be written in the FileStream.</param>
-	public static void WriteOutput(System.IO.FileStream FileStreamWrite, sbyte[] Source)
+	public static void WriteOutput(System.IO.FileStream FileStreamWrite, byte[] source)
 	{
-		FileStreamWrite.Write(ToByteArray(Source), 0, Source.Length);
+		FileStreamWrite.Write(source, 0, source.Length);
 	}
-
 
 	/*******************************/
 	/// <summary>
@@ -178,5 +131,4 @@ public class SupportClass
 		stream.Write(throwable.StackTrace);
 		stream.Flush();
 	}
-
 }
