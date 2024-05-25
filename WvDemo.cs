@@ -16,7 +16,6 @@ public class WvDemo
 	static WvDemo()
 	{
 		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
-		pcm_buffer = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
 	}
 	/*
 	public WvDemo()
@@ -27,7 +26,6 @@ public class WvDemo
 	private void InitBlock()
 	{
 		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
-		pcm_buffer = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
 	}
 	*/
 	
@@ -44,7 +42,6 @@ public class WvDemo
 		sbyte[] myDataChunkHeaderAsByteArray = new sbyte[8];
 		
 		long total_unpacked_samples = 0, total_samples; // was uint32_t in C
-		int num_channels, bps, bits;
 		WavpackContext wpc = new WavpackContext();
 		System.IO.FileStream fistream = null;
 		System.IO.BinaryReader reader;
@@ -86,25 +83,27 @@ public class WvDemo
 
 		System.Console.Out.WriteLine("The WavPack file has:");
 
-		num_channels = WavPackUtils.WavpackGetReducedChannels(wpc);
+		int num_channels = WavPackUtils.WavpackGetReducedChannels(wpc);
 		
 		System.Console.Out.WriteLine(num_channels + " channels");
 
-		bps = WavPackUtils.WavpackGetBytesPerSample(wpc);
-		bits = WavPackUtils.WavpackGetBitsPerSample(wpc);
+		int bits = WavPackUtils.WavpackGetBitsPerSample(wpc);
 
 		System.Console.Out.WriteLine(bits + " bits per sample");
 
 		total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		
 		System.Console.Out.WriteLine(total_samples + " samples");
-		
+
+		int byteps = WavPackUtils.WavpackGetBytesPerSample(wpc);
+		int block_align = byteps * num_channels;
+
 		myRiffChunkHeader.ckID[0] = 'R';
 		myRiffChunkHeader.ckID[1] = 'I';
 		myRiffChunkHeader.ckID[2] = 'F';
 		myRiffChunkHeader.ckID[3] = 'F';
 		
-		myRiffChunkHeader.ckSize = total_samples * num_channels * bps + 8 * 2 + 16 + 4;
+		myRiffChunkHeader.ckSize = total_samples * block_align + 8 * 2 + 16 + 4;
 		myRiffChunkHeader.formType[0] = 'W';
 		myRiffChunkHeader.formType[1] = 'A';
 		myRiffChunkHeader.formType[2] = 'V';
@@ -120,7 +119,7 @@ public class WvDemo
 		WaveHeader.FormatTag = 1;
 		WaveHeader.NumChannels = num_channels;
 		WaveHeader.SampleRate = WavPackUtils.WavpackGetSampleRate(wpc);
-		WaveHeader.BlockAlign = num_channels * bps;
+		WaveHeader.BlockAlign = block_align;
 		WaveHeader.BytesPerSecond = WaveHeader.SampleRate * WaveHeader.BlockAlign;
 		WaveHeader.BitsPerSample = bits;
 		
@@ -128,7 +127,7 @@ public class WvDemo
 		DataChunkHeader.ckID[1] = 'a';
 		DataChunkHeader.ckID[2] = 't';
 		DataChunkHeader.ckID[3] = 'a';
-		DataChunkHeader.ckSize = total_samples * num_channels * bps;
+		DataChunkHeader.ckSize = total_samples * block_align;
 		
 		myRiffChunkHeaderAsByteArray[0] = (sbyte) myRiffChunkHeader.ckID[0];
 		myRiffChunkHeaderAsByteArray[1] = (sbyte) myRiffChunkHeader.ckID[1];
@@ -228,8 +227,8 @@ public class WvDemo
 					{
 						samples_unpacked = samples_unpacked * num_channels;
 
-						pcm_buffer = format_samples(bps, temp_buffer, samples_unpacked);
-						fostream.Write(pcm_buffer, 0, (int)samples_unpacked * bps);
+						format_samples(temp_buffer, samples_unpacked, block_align, byteps);
+						fostream.Write(pcm_buffer, 0, (int)samples_unpacked * byteps);
 					}
 
 					if (total_unpacked_samples % loop_samples == 0)
@@ -265,69 +264,69 @@ public class WvDemo
 		
 		System.Environment.Exit(0);
 	}
-	
-	
+
+
 	// Reformat samples from longs in processor's native endian mode to
 	// little-endian data with (possibly) less than 4 bytes / sample.
-	
-	internal static byte[] format_samples(int bps, int[] src, long samcnt)
+
+	internal static void format_samples(int[] src, long samcnt, int block_align, int bps)
 	{
 		int temp;
 		int counter = 0;
 		int counter2 = 0;
-		byte[] dst = new byte[4 * Defines.SAMPLE_BUFFER_SIZE];
-		
+
+		var len = samcnt * block_align;
+		if (pcm_buffer == null || pcm_buffer.Length < len)
+			pcm_buffer = new byte[len];
+
 		switch (bps)
 		{
-			case 1: 
+			case 1:
 				while (samcnt > 0)
 				{
-					dst[counter++] = (byte) (0x00FF & (src[counter] + 128));
+					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter] + 128));
 					samcnt--;
 				}
 				break;
-			
-			case 2: 
-				while (samcnt > 0)
-				{
-					temp = src[counter2];
-					dst[counter++] = (byte) temp;
-					//dst[counter] = (byte) (SupportClass.URShift(temp, 8));
-					dst[counter++] = (byte) (temp >> 8);
-					counter2++;
-					samcnt--;
-				}
-				
-				break;
-			
-			case 3: 
+
+			case 2:
 				while (samcnt > 0)
 				{
 					temp = src[counter2];
-					dst[counter++] = (byte) temp;
-                    dst[counter++] = (byte)(temp >> 8);
-                    dst[counter++] = (byte)(temp >> 16);
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(temp >> 8);
 					counter2++;
 					samcnt--;
 				}
-				
+
 				break;
-			
-			case 4: 
+
+			case 3:
 				while (samcnt > 0)
 				{
 					temp = src[counter2];
-					dst[counter++] = (byte) temp;
-					dst[counter++] = (byte) (SupportClass.URShift(temp, 8));
-					dst[counter++] = (byte) (SupportClass.URShift(temp, 16));
-					dst[counter++] = (byte) (SupportClass.URShift(temp, 24));
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(temp >> 8);
+					pcm_buffer[counter++] = (byte)(temp >> 16);
 					counter2++;
 					samcnt--;
 				}
-				
+
 				break;
-			}
-		
-		return dst;
+
+			case 4:
+				while (samcnt > 0)
+				{
+					temp = src[counter2];
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 8));
+					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 16));
+					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 24));
+					counter2++;
+					samcnt--;
+				}
+
+				break;
+		}
 	}
 }

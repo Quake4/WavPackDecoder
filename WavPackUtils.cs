@@ -319,7 +319,7 @@ public class WavPackUtils
 		}
 		else
 		{
-			return (long) 44100;
+			return 44100;
 		}
 	}
 	
