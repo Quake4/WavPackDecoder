@@ -61,10 +61,16 @@ public class WvDemo
 		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 
-		System.Console.Out.WriteLine("The WavPack file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
+		System.Console.Out.WriteLine("The WavPack " + (wpc.five ? "5" : "4") + " file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
+
+		if (num_channels > 2)
+		{
+			System.Console.Error.WriteLine("Only two channels supported");
+			System.Environment.Exit(1);
+		}
 
 		try
 		{
@@ -287,9 +293,9 @@ public class WvDemo
 				{
 					temp = src[counter2];
 					pcm_buffer[counter++] = (byte)temp;
-					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 8));
-					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 16));
-					pcm_buffer[counter++] = (byte)(SupportClass.URShift(temp, 24));
+					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 8);
+					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 16);
+					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24);
 					counter2++;
 					samcnt--;
 				}

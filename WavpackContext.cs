@@ -23,6 +23,8 @@ public class WavpackContext
 	internal int lossy_blocks;
 	internal int status = 0; // 0 ok, 1 error
 
+	internal bool five = false;
+
 	// optional = new
 	internal eFileFormat file_format = eFileFormat.WP_FORMAT_WAV;
 	internal string file_extension = null;

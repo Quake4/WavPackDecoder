@@ -345,10 +345,27 @@ class UnpackUtils
 		wpc.config.channel_mask = mask;
 		return Defines.TRUE;
 	}
-	
-	
+
+
 	// Read configuration information from metadata.
-	
+
+	internal static int read_new_config_info(WavpackContext wpc, WavpackMetadata wpmd)
+	{
+		int bytecnt = wpmd.byte_length;
+		byte[] byteptr = wpmd.data;
+		int counter = 0;
+
+		wpc.five = true;
+
+		if (bytecnt >= 1)
+			wpc.file_format = (eFileFormat)byteptr[counter++];
+
+		return Defines.TRUE;
+	}
+
+
+	// Read configuration information from metadata.
+
 	internal static int read_config_info(WavpackContext wpc, WavpackMetadata wpmd)
 	{
 		int bytecnt = wpmd.byte_length;
@@ -362,6 +379,9 @@ class UnpackUtils
 			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 16);
 			wpc.config.flags |= (long) ((byteptr[counter] & 0xFF) << 24);
 		}
+
+		if (bytecnt >= 5)
+			wpc.five = true;
 		
 		return Defines.TRUE;
 	}

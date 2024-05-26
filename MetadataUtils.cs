@@ -184,6 +184,9 @@ class MetadataUtils
 				return Defines.TRUE;
 
 			// ID_OPTIONAL_DATA
+			case Defines.ID_NEW_CONFIG_BLOCK:
+				return UnpackUtils.read_new_config_info(wpc, wpmd);
+
 			case Defines.ID_RIFF_HEADER:
 				return UnpackUtils.read_riff_header(wpc, wpmd);
 
