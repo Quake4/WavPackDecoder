@@ -234,10 +234,8 @@ public class WavPackUtils
 			samples -= samples_to_unpack;
 			
 			if (wps.sample_index == wps.wphdr.block_index + wps.wphdr.block_samples)
-			{
 				if (UnpackUtils.check_crc_error(wpc) > 0)
 					wpc.crc_errors++;
-			}
 			
 			if (wps.sample_index == wpc.total_samples)
 				break;

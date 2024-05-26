@@ -29,7 +29,7 @@ class UnpackUtils
 			wps.sample_index = wps.wphdr.block_index;
 		
 		wps.mute_error = 0;
-		wps.crc = 0xffffffff;
+		wps.crc = unchecked ((int) 0xffffffff);
 		wps.wvbits.sr = 0;
 		
 		while ((MetadataUtils.read_metadata_buff(wpc, wpmd)) == Defines.TRUE)
@@ -406,8 +406,8 @@ class UnpackUtils
 		WavpackStream wps = wpc.stream;
 		long flags = wps.wphdr.flags;
 		long i;
-		int crc = (int) wps.crc;
-		
+		int crc = wps.crc;
+
 		int mute_limit = (int) ((1L << (int) ((flags & Defines.MAG_MASK) >> Defines.MAG_LSB)) + 2);
 		decorr_pass dpp;
 		int tcount;
@@ -467,16 +467,17 @@ class UnpackUtils
 			int bf_abs;
 			int crclimit = (int)(sample_count + bufferStartPos);
 			
-			for (int q = 0; q < crclimit; q++)
+			for (int q = bufferStartPos; q < crclimit; q++)
 			{
-				bf_abs = (buffer[q] < 0?- buffer[q]:buffer[q]);
+				var bf_i = buffer[q];
+				bf_abs = bf_i < 0 ? -bf_i : bf_i;
 				
 				if (bf_abs > mute_limit)
 				{
 					i = q;
 					break;
 				}
-				crc = crc * 3 + buffer[q];
+				crc = crc * 3 + bf_i;
 			}
 		}
 		//////////////////// handle version 4 stereo data ////////////////////////

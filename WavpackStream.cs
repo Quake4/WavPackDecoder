@@ -26,7 +26,8 @@ class WavpackStream
 	
 	internal int num_terms = 0;
 	internal int mute_error;
-	internal long sample_index, crc; // was uint32_t in C
+	internal int crc;
+	internal long sample_index; // was uint32_t in C
 	
 	internal short int32_sent_bits, int32_zeros, int32_ones, int32_dups; // was uchar in C
 	internal short float_flags, float_shift, float_max_exp, float_norm_exp; // was uchar in C
