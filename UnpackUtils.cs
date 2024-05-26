@@ -1470,7 +1470,6 @@ class UnpackUtils
 		
 		if ((flags & Defines.INT32_DATA) > 0)
 		{
-			
 			int sent_bits = wps.int32_sent_bits, zeros = wps.int32_zeros;
 			int ones = wps.int32_ones, dups = wps.int32_dups;
 			int buffer_counter = bufferStartPos;
@@ -1510,25 +1509,20 @@ class UnpackUtils
 			
 			switch ((int) (flags & (long) Defines.BYTES_STORED))
 			{
-
-				
 				case 0: 
 					min_shifted = (min_value = - 128 >> shift) << shift;
 					max_shifted = (max_value = 127 >> shift) << shift;
 					break;
-				
 				
 				case 1: 
 					min_shifted = (min_value = - 32768 >> shift) << shift;
 					max_shifted = (max_value = 32767 >> shift) << shift;
 					break;
 				
-				
 				case 2: 
 					min_shifted = (min_value = - 8388608 >> shift) << shift;
 					max_shifted = (max_value = 8388607 >> shift) << shift;
 					break;
-				
 				
 				case 3: 
 				default: 
@@ -1555,7 +1549,6 @@ class UnpackUtils
 		}
 		else if (shift != 0)
 		{
-			
 			int buffer_counter = bufferStartPos;
 			
 			if ((flags & Defines.MONO_FLAG) == 0)
