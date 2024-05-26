@@ -76,7 +76,7 @@ public class WvDemo
 		{
 			using (var fostream = new System.IO.FileStream(System.IO.Path.ChangeExtension(inputWVFile, WavPackUtils.WavpackGetFileExtension(wpc)), System.IO.FileMode.Create))
 			{
-				if (wpc.riff_header != null)
+				if (wpc.riff_header != null && (wpc.config.flags & Defines.CONFIG_FLOAT_DATA) == 0)
 					fostream.Write(wpc.riff_header, 0, wpc.riff_header.Length);
 				else
 				{
