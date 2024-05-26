@@ -367,8 +367,6 @@ class WordsUtils
 				ones_count = w.holding_zero = 0;
 			else
 			{
-				int next8;
-				
 				if (bs.bc < 8)
 				{
 					
@@ -380,12 +378,10 @@ class WordsUtils
 
 					bs.sr |= (uint)(bs.buf[bs.buf_index] << bs.bc);
 					
-					next8 = (int)(bs.sr & 0xff);
-					
 					bs.bc += 8;
 				}
-				else
-					next8 = (int)(bs.sr & 0xff);
+
+				byte next8 = (byte)bs.sr;
 				
 				if (next8 == 0xff)
 				{
