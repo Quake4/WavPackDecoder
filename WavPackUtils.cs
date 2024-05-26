@@ -560,7 +560,6 @@ public class WavPackUtils
 			
 			if (buffer[0] == 'w' && buffer[1] == 'v' && buffer[2] == 'p' && buffer[3] == 'k' && (buffer[4] & 1) == 0 && buffer[6] < 16 && buffer[7] == 0 && buffer[9] == 4 && buffer[8] >= (Defines.MIN_STREAM_VERS & 0xff) && buffer[8] <= (Defines.MAX_STREAM_VERS & 0xff))
 			{
-				
 				wphdr.ckID[0] = 'w';
 				wphdr.ckID[1] = 'v';
 				wphdr.ckID[2] = 'p';

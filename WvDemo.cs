@@ -17,19 +17,7 @@ public class WvDemo
 	{
 		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
 	}
-	/*
-	public WvDemo()
-	{
-		InitBlock();
-	}
 
-	private void InitBlock()
-	{
-		temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
-	}
-	*/
-	
-	[System.STAThread]
 	public static void  Main(string[] args)
 	{
 		ChunkHeader FormatChunkHeader = new ChunkHeader();
