@@ -13,8 +13,8 @@ class WavpackMetadata
 {
 	internal int byte_length;
 	internal byte[] data;
-	internal short id; // was uchar in C
-	internal int hasdata = 0; // 0 does not have data, 1 has data
+	internal byte id;
+	internal bool hasdata;
 	internal int status = 0; // 0 ok, 1 error
 	internal long bytecount = 24; 	// we use this to determine if we have read all the metadata 
 					// in a block by checking bytecount again the block length

@@ -70,7 +70,7 @@ class UnpackUtils
 	{
 		WavpackStream wps = wpc.stream;
 		
-		if (wpmd.hasdata == Defines.TRUE)
+		if (wpmd.hasdata)
 			wps.wvbits = BitsUtils.bs_open_read(wpmd.data, (short) 0, (short) wpmd.byte_length, wpc.infile, 0, 0);
 		else if (wpmd.byte_length > 0)
 		{
@@ -458,11 +458,10 @@ class UnpackUtils
 			
 			i = WordsUtils.get_words(sample_count, flags, wps.w, wps.wvbits, buffer, bufferStartPos);
 			
-			for (tcount = wps.num_terms - 1; tcount >= 0; tcount--)
+			for (tcount = wps.num_terms; tcount > 0; tcount--, dpp_index++)
 			{
 				dpp = wps.decorr_passes[dpp_index];
 				decorr_mono_pass(dpp, buffer, sample_count, bufferStartPos);
-				dpp_index++;
 			}
 			
 			int bf_abs;
@@ -491,29 +490,21 @@ class UnpackUtils
 			{
 				int dpp_index = 0;
 				
-				for (tcount = wps.num_terms - 1; tcount >= 0; tcount--)
+				for (tcount = wps.num_terms; tcount > 0; tcount--, dpp_index++)
 				{
 					dpp = wps.decorr_passes[dpp_index];
 					decorr_stereo_pass(dpp, buffer, sample_count, bufferStartPos);
-					wps.decorr_passes[dpp_index] = dpp;
-					dpp_index++;
 				}
 			}
 			else
 			{
 				int dpp_index = 0;
 				
-				for (tcount = wps.num_terms - 1; tcount >= 0; tcount--)
+				for (tcount = wps.num_terms; tcount > 0; tcount--, dpp_index++)
 				{
 					dpp = wps.decorr_passes[dpp_index];
-					
 					decorr_stereo_pass(dpp, buffer, 8, bufferStartPos);
-
 					decorr_stereo_pass_cont(dpp, buffer, sample_count - 8, bufferStartPos + 16);
-
-					wps.decorr_passes[dpp_index] = dpp;
-					
-					dpp_index++;
 				}
 			}
 			

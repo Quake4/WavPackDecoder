@@ -14,7 +14,7 @@ class MetadataUtils
 	internal static int read_metadata_buff(WavpackContext wpc, WavpackMetadata wpmd)
 	{
 		long bytes_to_read;
-		short tchar;
+		byte tchar;
 		
 		if (wpmd.bytecount >= wpc.stream.wphdr.ckSize)
 		{
@@ -24,8 +24,8 @@ class MetadataUtils
 		
 		try
 		{
-			wpmd.id = (short) wpc.infile.ReadByte();
-			tchar = (short) wpc.infile.ReadByte();
+			wpmd.id = wpc.infile.ReadByte();
+			tchar = wpc.infile.ReadByte();
 		}
 		catch (System.Exception)
 		{
@@ -39,11 +39,11 @@ class MetadataUtils
 		
 		if ((wpmd.id & Defines.ID_LARGE) != 0)
 		{
-			wpmd.id &= (short)~ Defines.ID_LARGE;
+			wpmd.id &= (byte) ~Defines.ID_LARGE;
 			
 			try
 			{
-				tchar = (short) wpc.infile.ReadByte();
+				tchar = wpc.infile.ReadByte();
 			}
 			catch (System.Exception)
 			{
@@ -51,11 +51,11 @@ class MetadataUtils
 				return Defines.FALSE;
 			}
 			
-			wpmd.byte_length += ((int) tchar << 9);
+			wpmd.byte_length += tchar << 9;
 			
 			try
 			{
-				tchar = (short) wpc.infile.ReadByte();
+				tchar = wpc.infile.ReadByte();
 			}
 			catch (System.Exception)
 			{
@@ -69,13 +69,13 @@ class MetadataUtils
 		
 		if ((wpmd.id & Defines.ID_ODD_SIZE) != 0)
 		{
-			wpmd.id &= (short)~ Defines.ID_ODD_SIZE;
+			wpmd.id &= (byte)~ Defines.ID_ODD_SIZE;
 			wpmd.byte_length--;
 		}
 		
 		if (wpmd.byte_length == 0 || wpmd.id == Defines.ID_WV_BITSTREAM)
 		{
-			wpmd.hasdata = Defines.FALSE;
+			wpmd.hasdata = false;
 			return Defines.TRUE;
 		}
 		
@@ -86,7 +86,7 @@ class MetadataUtils
 		if (bytes_to_read > wpc.read_buffer.Length)
 		{
 			int bytes_read;
-			wpmd.hasdata = Defines.FALSE;
+			wpmd.hasdata = false;
 			
 			while (bytes_to_read > wpc.read_buffer.Length)
 			{
@@ -108,7 +108,7 @@ class MetadataUtils
 		}
 		else
 		{
-			wpmd.hasdata = Defines.TRUE;
+			wpmd.hasdata = false;
 			wpmd.data = wpc.read_buffer;
 		}
 		
@@ -122,13 +122,13 @@ class MetadataUtils
 
 				if (bytes_read != (int) bytes_to_read)
 				{
-					wpmd.hasdata = Defines.FALSE;
+					wpmd.hasdata = false;
 					return Defines.FALSE;
 				}
 			}
 			catch (System.Exception)
 			{
-				wpmd.hasdata = Defines.FALSE;
+				wpmd.hasdata = false;
 				return Defines.FALSE;
 			}
 		}

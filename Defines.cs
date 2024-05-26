@@ -43,20 +43,20 @@ public class Defines
 	internal static int MAX_STREAM_VERS = 0x410; // highest stream version we'll decode
 	
 	
-	internal const short ID_DUMMY = (short) (0x0);
-	internal static short ID_ENCODER_INFO = (short) (0x1);
-	internal const short ID_DECORR_TERMS = (short) (0x2);
-	internal const short ID_DECORR_WEIGHTS = (short) (0x3);
-	internal const short ID_DECORR_SAMPLES = (short) (0x4);
-	internal const short ID_ENTROPY_VARS = (short) (0x5);
-	internal const short ID_HYBRID_PROFILE = (short) (0x6);
-	internal const short ID_SHAPING_WEIGHTS = (short) (0x7);
-	internal const short ID_FLOAT_INFO = (short) (0x8);
-	internal const short ID_INT32_INFO = (short) (0x9);
-	internal const short ID_WV_BITSTREAM = (short) (0xa);
-	internal const short ID_WVC_BITSTREAM = (short) (0xb);
-	internal const short ID_WVX_BITSTREAM = (short) (0xc);
-	internal const short ID_CHANNEL_INFO = (short) (0xd);
+	internal const byte ID_DUMMY = 0x0;
+	internal const byte ID_ENCODER_INFO = 0x1;
+	internal const byte ID_DECORR_TERMS = 0x2;
+	internal const byte ID_DECORR_WEIGHTS = 0x3;
+	internal const byte ID_DECORR_SAMPLES = 0x4;
+	internal const byte ID_ENTROPY_VARS = 0x5;
+	internal const byte ID_HYBRID_PROFILE = 0x6;
+	internal const byte ID_SHAPING_WEIGHTS = 0x7;
+	internal const byte ID_FLOAT_INFO = 0x8;
+	internal const byte ID_INT32_INFO = 0x9;
+	internal const byte ID_WV_BITSTREAM = 0xa;
+	internal const byte ID_WVC_BITSTREAM = 0xb;
+	internal const byte ID_WVX_BITSTREAM = 0xc;
+	internal const byte ID_CHANNEL_INFO = 0xd;
 	
 	internal static int JOINT_STEREO = 0x10; // joint stereo
 	internal static int CROSS_DECORR = 0x20; // no-delay cross decorrelation
@@ -76,7 +76,7 @@ public class Defines
 	internal static int FLOAT_EXCEPTIONS = 0x20; // contains exceptions (inf, nan, etc.)
 	
 	
-	internal static short ID_OPTIONAL_DATA = (short) (0x20);
+	internal static byte ID_OPTIONAL_DATA = 0x20;
 	internal static int ID_ODD_SIZE = 0x40;
 	internal static int ID_LARGE = 0x80;
 	
@@ -86,13 +86,13 @@ public class Defines
 	internal static int MAG_LSB = 18;
 	internal static long MAG_MASK = (0x1fL << MAG_LSB);
 	
-	internal const short ID_RIFF_HEADER = (short) (0x21);
-	internal const short ID_RIFF_TRAILER = (short) (0x22);
-	internal const short ID_REPLAY_GAIN = (short) (0x23);
-	internal const short ID_CUESHEET = (short) (0x24);
-	internal const short ID_CONFIG_BLOCK = (short) (0x25);
-	internal const short ID_MD5_CHECKSUM = (short) (0x26);
-	internal const short ID_SAMPLE_RATE = (short) (0x27);
+	internal const byte ID_RIFF_HEADER = 0x21;
+	internal const byte ID_RIFF_TRAILER = 0x22;
+	internal const byte ID_REPLAY_GAIN = 0x23;
+	internal const byte ID_CUESHEET = 0x24;
+	internal const byte ID_CONFIG_BLOCK = 0x25;
+	internal const byte ID_MD5_CHECKSUM = 0x26;
+	internal const byte ID_SAMPLE_RATE = 0x27;
 	
 	internal static long CONFIG_BYTES_STORED = 3; // 1-4 bytes/sample
 	internal static long CONFIG_MONO_FLAG = 4; // not stereo

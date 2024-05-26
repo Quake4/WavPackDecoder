@@ -66,7 +66,7 @@ public class WvDemo
 		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 
-		System.Console.Out.WriteLine("The WavPack file has:");
+		System.Console.Out.WriteLine("The WavPack file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
