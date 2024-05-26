@@ -16,7 +16,7 @@
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>"e:\Sync\Music\FLAC\Наутилус Помпилиус\Дискография\Переиздания\Nautilus_Pompilius_-_1997_Atlantida_%28AXCD5-0051_eac_wv_log_cue_scans%29_by_LAI671_%28Netlab%29.iso.wv"</StartArguments>
+    <StartArguments>e:\Sync\Music\FLAC\Test\WavPack\num_channels\multichannel-6.wv</StartArguments>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
 </Project>

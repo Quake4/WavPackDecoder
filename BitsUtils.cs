@@ -28,7 +28,7 @@ class BitsUtils
 				// wrap call here
 				bs = bs_read(bs);
 			}
-			bs.sr = (bs.buf[bs.buf_index] & 0xff);
+			bs.sr = bs.buf[bs.buf_index];
 		}
 		
 		bool result = (bs.sr & 1) > 0;
@@ -51,9 +51,7 @@ class BitsUtils
 				bs = bs_read(bs);
 			}
 			uns_buf = bs.buf[bs.buf_index] & 0xff;
-			bs.sr = bs.sr | ((long)uns_buf << bs.bc); // values in buffer must be unsigned
-			
-			bs.sr = bs.sr & 0xFFFFFFFFL;        // sr is an unsigned 32 bit variable
+			bs.sr |= (uint)(uns_buf << bs.bc);
 			
 			bs.bc += 8;
 		}
@@ -63,7 +61,7 @@ class BitsUtils
 		if (bs.bc > 32)
 		{
 			bs.bc -= nbits;
-			bs.sr = (bs.buf[bs.buf_index] & 0xff) >> (8 - bs.bc);
+			bs.sr = (uint)(bs.buf[bs.buf_index] >> (8 - bs.bc));
 		}
 		else
 		{

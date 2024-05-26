@@ -86,7 +86,7 @@ class WordsUtils
 		
 		for (i = 0; i < 6; i++)
 		{
-			b_array[i] = (int) (byteptr[i] & 0xff);
+			b_array[i] = byteptr[i];
 		}
 		
 		w.holding_one = 0;
@@ -108,7 +108,7 @@ class WordsUtils
 		{
 			for (i = 6; i < 12; i++)
 			{
-				b_array[i] = (int) (byteptr[i] & 0xff);
+				b_array[i] = byteptr[i];
 			}
 			w.c[1].median[0] = exp2s(b_array[6] + (b_array[7] << 8));
 			w.c[1].median[1] = exp2s(b_array[8] + (b_array[9] << 8));
@@ -136,48 +136,48 @@ class WordsUtils
 		
 		if ((wps.wphdr.flags & Defines.HYBRID_BITRATE) != 0)
 		{
-			uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-			uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+			uns_buf = byteptr[buffer_counter];
+			uns_buf_plusone = byteptr[buffer_counter + 1];
 			
 			wps.w.c[0].slow_level = exp2s(uns_buf + (uns_buf_plusone << 8));
 			buffer_counter = buffer_counter + 2;
 			
 			if ((wps.wphdr.flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 			{
-				uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-				uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+				uns_buf = byteptr[buffer_counter];
+				uns_buf_plusone = byteptr[buffer_counter + 1];
 				wps.w.c[1].slow_level = exp2s(uns_buf + (uns_buf_plusone << 8));
 				buffer_counter = buffer_counter + 2;
 			}
 		}
 		
-		uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-		uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+		uns_buf = byteptr[buffer_counter];
+		uns_buf_plusone = byteptr[buffer_counter + 1];
 		
-		wps.w.bitrate_acc[0] = (int) (uns_buf + (uns_buf_plusone << 8)) << 16;
+		wps.w.bitrate_acc[0] = (uns_buf + (uns_buf_plusone << 8)) << 16;
 		buffer_counter = buffer_counter + 2;
 		
 		if ((wps.wphdr.flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 		{
-			uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-			uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+			uns_buf = byteptr[buffer_counter];
+			uns_buf_plusone = byteptr[buffer_counter + 1];
 			
-			wps.w.bitrate_acc[1] = (int) (uns_buf + (uns_buf_plusone << 8)) << 16;
+			wps.w.bitrate_acc[1] = (uns_buf + (uns_buf_plusone << 8)) << 16;
 			buffer_counter = buffer_counter + 2;
 		}
 		
 		if (buffer_counter < bytecnt)
 		{
-			uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-			uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+			uns_buf = byteptr[buffer_counter];
+			uns_buf_plusone = byteptr[buffer_counter + 1];
 			
 			wps.w.bitrate_delta[0] = exp2s((short) (uns_buf + (uns_buf_plusone << 8)));
 			buffer_counter = buffer_counter + 2;
 			
 			if ((wps.wphdr.flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 			{
-				uns_buf = (int) (byteptr[buffer_counter] & 0xff);
-				uns_buf_plusone = (int) (byteptr[buffer_counter + 1] & 0xff);
+				uns_buf = byteptr[buffer_counter];
+				uns_buf_plusone = byteptr[buffer_counter + 1];
 				wps.w.bitrate_delta[1] = exp2s((short) (uns_buf + (uns_buf_plusone << 8)));
 				buffer_counter = buffer_counter + 2;
 			}
@@ -368,7 +368,6 @@ class WordsUtils
 			else
 			{
 				int next8;
-				int uns_buf;
 				
 				if (bs.bc < 8)
 				{
@@ -379,9 +378,7 @@ class WordsUtils
 					if (bs.ptr == bs.end)
 						bs = BitsUtils.bs_read(bs);
 
-					uns_buf = bs.buf[bs.buf_index] & 0xff;
-					
-					bs.sr = bs.sr | ((long)uns_buf << bs.bc); // values in buffer must be unsigned
+					bs.sr |= (uint)(bs.buf[bs.buf_index] << bs.bc);
 					
 					next8 = (int)(bs.sr & 0xff);
 					
