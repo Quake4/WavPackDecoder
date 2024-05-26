@@ -1,4 +1,3 @@
-using System;
 /*
 ** WavpackContext.cs
 **
@@ -14,7 +13,6 @@ public class WavpackContext
 	internal WavpackConfig config = new WavpackConfig();
 	internal WavpackStream stream = new WavpackStream();
 	
-	
 	internal byte[] read_buffer = new byte[Defines.BITSTREAM_BUFFER_SIZE];
 	internal string error_message;
 	
@@ -24,4 +22,10 @@ public class WavpackContext
 	internal int reduced_channels = 0;
 	internal int lossy_blocks;
 	internal int status = 0; // 0 ok, 1 error
+
+	// optional = new
+	internal eFileFormat file_format = eFileFormat.WP_FORMAT_WAV;
+	internal string file_extension = null;
+	internal byte[] riff_header;
+	//internal byte[] riff_trailer;
 }

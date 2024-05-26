@@ -383,8 +383,17 @@ class UnpackUtils
 		
 		return Defines.TRUE;
 	}
-	
-	
+
+	internal static int read_riff_header(WavpackContext wpc, WavpackMetadata wpmd)
+	{
+		var bytes = new byte[wpmd.byte_length];
+		Array.Copy(wpmd.data, bytes, bytes.Length);
+		wpc.riff_header = bytes;
+
+		return Defines.TRUE;
+	}
+
+
 	// This monster actually unpacks the WavPack bitstream(s) into the specified
 	// buffer as 32-bit integers or floats (depending on orignal data). Lossy
 	// samples will be clipped to their original limits (i.e. 8-bit samples are
@@ -400,7 +409,7 @@ class UnpackUtils
 	// that handle an entire buffer. The function returns the total number of
 	// samples unpacked, which can be less than the number requested if an error
 	// occurs or the end of the block is reached.
-	
+
 	internal static long unpack_samples(WavpackContext wpc, int[] buffer, long sample_count, int bufferStartPos)
 	{
 		WavpackStream wps = wpc.stream;

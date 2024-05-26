@@ -142,88 +142,56 @@ class MetadataUtils
 		
 		switch (wpmd.id)
 		{
-			
-			case Defines.ID_DUMMY: 
-			{
+			case Defines.ID_DUMMY:
 				return Defines.TRUE;
-			}
-			
-			
-			case Defines.ID_DECORR_TERMS: 
-			{
+
+			case Defines.ID_DECORR_TERMS:
 				return UnpackUtils.read_decorr_terms(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_DECORR_WEIGHTS: 
-			{
+			case Defines.ID_DECORR_WEIGHTS:
 				return UnpackUtils.read_decorr_weights(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_DECORR_SAMPLES: 
-			{
+			case Defines.ID_DECORR_SAMPLES:
 				return UnpackUtils.read_decorr_samples(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_ENTROPY_VARS: 
-			{
+			case Defines.ID_ENTROPY_VARS:
 				return WordsUtils.read_entropy_vars(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_HYBRID_PROFILE: 
-			{
+			case Defines.ID_HYBRID_PROFILE:
 				return WordsUtils.read_hybrid_profile(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_FLOAT_INFO: 
-			{
+			case Defines.ID_FLOAT_INFO:
 				return FloatUtils.read_float_info(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_INT32_INFO: 
-			{
+			case Defines.ID_INT32_INFO:
 				return UnpackUtils.read_int32_info(wps, wpmd);
-			}
 			
-			
-			case Defines.ID_CHANNEL_INFO: 
-			{
+			case Defines.ID_CHANNEL_INFO:
 				return UnpackUtils.read_channel_info(wpc, wpmd);
-			}
 			
-			
-			case Defines.ID_SAMPLE_RATE: 
-			{
+			case Defines.ID_SAMPLE_RATE:
 				return UnpackUtils.read_sample_rate(wpc, wpmd);
-			}
 			
-			
-			case Defines.ID_CONFIG_BLOCK: 
-			{
+			case Defines.ID_CONFIG_BLOCK:
 				return UnpackUtils.read_config_info(wpc, wpmd);
-			}
 			
-			
-			case Defines.ID_WV_BITSTREAM: 
-			{
+			case Defines.ID_WV_BITSTREAM:
 				return UnpackUtils.init_wv_bitstream(wpc, wpmd);
-			}
 			
-			
-			case Defines.ID_SHAPING_WEIGHTS: 
-			case Defines.ID_WVC_BITSTREAM: 
-			case Defines.ID_WVX_BITSTREAM: 
-			{
+			case Defines.ID_SHAPING_WEIGHTS:
+			case Defines.ID_WVC_BITSTREAM:
+			case Defines.ID_WVX_BITSTREAM:
 				return Defines.TRUE;
-			}
-			
-			
-			default: 
+
+			// ID_OPTIONAL_DATA
+			case Defines.ID_RIFF_HEADER:
+				return UnpackUtils.read_riff_header(wpc, wpmd);
+
+			case Defines.ID_ALT_EXTENSION:
+				wpc.file_extension = System.Text.Encoding.UTF8.GetString(wpmd.data, 0, wpmd.byte_length);
+				return Defines.TRUE;
+
+			default:
 				{
 					if ((wpmd.id & Defines.ID_OPTIONAL_DATA) != 0)
 					{

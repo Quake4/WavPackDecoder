@@ -11,14 +11,12 @@ using System;
 
 public class WavPackUtils
 {
-	
-	
 	///////////////////////////// local table storage ////////////////////////////
 	
 	internal static long[] sample_rates = new long[]{6000, 8000, 9600, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000, 192000};
 	
 	///////////////////////////// executable code ////////////////////////////////
-	
+
 	
 	// This function reads data from the specified stream in search of a valid
 	// WavPack 4.0 audio block. If this fails in 1 megabyte (or an invalid or
@@ -171,7 +169,6 @@ public class WavPackUtils
 		{
 			if (wps.wphdr.block_samples == 0 || (wps.wphdr.flags & Defines.INITIAL_BLOCK) == 0 || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples)
 			{
-				
 				wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
 				
 				if (wps.wphdr.status == 1)
@@ -259,7 +256,7 @@ public class WavPackUtils
 		}
 		else
 		{
-			return (long) (- 1);
+			return -1;
 		}
 	}
 	
@@ -271,7 +268,7 @@ public class WavPackUtils
 		if (null != wpc)
 			return wpc.stream.sample_index;
 		
-		return (long) (- 1);
+		return -1;
 	}
 	
 	
@@ -286,7 +283,7 @@ public class WavPackUtils
 		}
 		else
 		{
-			return (long) 0;
+			return 0;
 		}
 	}
 	
@@ -399,9 +396,34 @@ public class WavPackUtils
 		}
 	}
 
-    // The following seek functionality has not yet been extensively tested
 
-    public static void setTime(WavpackContext wpc, long milliseconds)
+	// Return the file format specified in the call to WavpackSetFileInformation()
+	// when the file was created. For all files created prior to WavPack 5.0 this
+	// will 0 (WP_FORMAT_WAV).
+
+	public static eFileFormat WavpackGetFileFormat(WavpackContext wpc)
+	{
+		return wpc.file_format;
+	}
+
+
+	// Return a string representing the recommended file extension for the open
+	// WavPack file. For all files created prior to WavPack 5.0 this will be "wav",
+	// even for raw files with no RIFF into. This string is specified in the
+	// call to WavpackSetFileInformation() when the file was created.
+
+	public static string WavpackGetFileExtension(WavpackContext wpc)
+	{
+		if (wpc != null && wpc.file_extension != null)
+			return wpc.file_extension;
+		else
+			return "wav";
+	}
+
+
+	// The following seek functionality has not yet been extensively tested
+
+	public static void setTime(WavpackContext wpc, long milliseconds)
     {
         long targetSample = (long)(milliseconds / 1000 * wpc.config.sample_rate);
         try
