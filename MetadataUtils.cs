@@ -39,7 +39,7 @@ class MetadataUtils
 		
 		if ((wpmd.id & Defines.ID_LARGE) != 0)
 		{
-			wpmd.id &= (byte) ~Defines.ID_LARGE;
+			wpmd.id &= unchecked((byte) ~Defines.ID_LARGE);
 			
 			try
 			{
@@ -63,13 +63,13 @@ class MetadataUtils
 				return Defines.FALSE;
 			}
 			
-			wpmd.byte_length += ((int) tchar << 17);
+			wpmd.byte_length += tchar << 17;
 			wpmd.bytecount += 2;
 		}
 		
 		if ((wpmd.id & Defines.ID_ODD_SIZE) != 0)
 		{
-			wpmd.id &= (byte)~ Defines.ID_ODD_SIZE;
+			wpmd.id &= unchecked((byte)~ Defines.ID_ODD_SIZE);
 			wpmd.byte_length--;
 		}
 		

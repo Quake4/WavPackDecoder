@@ -33,7 +33,7 @@ public class WavPackUtils
 	// large integer or floating point files (but always provides at least 24 bits
 	// of resolution).
 	
-	public static WavpackContext WavpackOpenFileInput(System.IO.BinaryReader infile)
+	public static WavpackContext WavpackOpenFileInput(System.IO.BinaryReader infile, uint flags = 0)
 	{
 		WavpackContext wpc = new WavpackContext();
 		WavpackStream wps = wpc.stream;
@@ -97,7 +97,7 @@ public class WavPackUtils
 			wpc.config.channel_mask = 0x5 - wpc.config.num_channels;
 		}
 		
-		if ((wps.wphdr.flags & Defines.FINAL_BLOCK) == 0)
+		if ((flags & Defines.OPEN_2CH_MAX) > 0 && (wps.wphdr.flags & Defines.FINAL_BLOCK) == 0)
 		{
 			if ((wps.wphdr.flags & Defines.MONO_FLAG) != 0)
 				wpc.reduced_channels = 1;

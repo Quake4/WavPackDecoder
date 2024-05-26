@@ -29,12 +29,12 @@ class UnpackUtils
 			wps.sample_index = wps.wphdr.block_index;
 		
 		wps.mute_error = 0;
-		wps.crc = unchecked ((int) 0xffffffff);
+		wps.crc = -1;
 		wps.wvbits.sr = 0;
 		
-		while ((MetadataUtils.read_metadata_buff(wpc, wpmd)) == Defines.TRUE)
+		while (MetadataUtils.read_metadata_buff(wpc, wpmd) == Defines.TRUE)
 		{
-			if ((MetadataUtils.process_metadata(wpc, wpmd)) == Defines.FALSE)
+			if (MetadataUtils.process_metadata(wpc, wpmd) == Defines.FALSE)
 			{
 				wpc.error_message = "invalid metadata!";
 				return Defines.FALSE;
@@ -224,10 +224,10 @@ class UnpackUtils
 		{
 			if (dpp.term > Defines.MAX_TERM)
 			{
-				uns_buf0 = (int) (byteptr[counter] & 0xff);
-				uns_buf1 = (int) (byteptr[counter + 1] & 0xff);
-				uns_buf2 = (int) (byteptr[counter + 2] & 0xff);
-				uns_buf3 = (int) (byteptr[counter + 3] & 0xff);
+				uns_buf0 = byteptr[counter];
+				uns_buf1 = byteptr[counter + 1];
+				uns_buf2 = byteptr[counter + 2];
+				uns_buf3 = byteptr[counter + 3];
 				
 				dpp.samples_A[0] = WordsUtils.exp2s((short) (uns_buf0 + (uns_buf1 << 8)));
 				dpp.samples_A[1] = WordsUtils.exp2s((short) (uns_buf2 + (uns_buf3 << 8)));
@@ -236,10 +236,10 @@ class UnpackUtils
 				if ((wps.wphdr.flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 				{
 					
-					uns_buf0 = (int) (byteptr[counter] & 0xff);
-					uns_buf1 = (int) (byteptr[counter + 1] & 0xff);
-					uns_buf2 = (int) (byteptr[counter + 2] & 0xff);
-					uns_buf3 = (int) (byteptr[counter + 3] & 0xff);
+					uns_buf0 = byteptr[counter];
+					uns_buf1 = byteptr[counter + 1];
+					uns_buf2 = byteptr[counter + 2];
+					uns_buf3 = byteptr[counter + 3];
 					
 					dpp.samples_B[0] = WordsUtils.exp2s((short) (uns_buf0 + (uns_buf1 << 8)));
 					dpp.samples_B[1] = WordsUtils.exp2s((short) (uns_buf2 + (uns_buf3 << 8)));
@@ -249,10 +249,10 @@ class UnpackUtils
 			else if (dpp.term < 0)
 			{
 				
-				uns_buf0 = (int) (byteptr[counter] & 0xff);
-				uns_buf1 = (int) (byteptr[counter + 1] & 0xff);
-				uns_buf2 = (int) (byteptr[counter + 2] & 0xff);
-				uns_buf3 = (int) (byteptr[counter + 3] & 0xff);
+				uns_buf0 = byteptr[counter];
+				uns_buf1 = byteptr[counter + 1];
+				uns_buf2 = byteptr[counter + 2];
+				uns_buf3 = byteptr[counter + 3];
 				
 				dpp.samples_A[0] = WordsUtils.exp2s((short) (uns_buf0 + (uns_buf1 << 8)));
 				dpp.samples_B[0] = WordsUtils.exp2s((short) (uns_buf2 + (uns_buf3 << 8)));
@@ -265,16 +265,16 @@ class UnpackUtils
 				
 				while (cnt > 0)
 				{
-					uns_buf0 = (int) (byteptr[counter] & 0xff);
-					uns_buf1 = (int) (byteptr[counter + 1] & 0xff);
+					uns_buf0 = byteptr[counter];
+					uns_buf1 = byteptr[counter + 1];
 					
 					dpp.samples_A[m] = WordsUtils.exp2s((short) (uns_buf0 + (uns_buf1 << 8)));
 					counter += 2;
 					
 					if ((wps.wphdr.flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) == 0)
 					{
-						uns_buf0 = (int) (byteptr[counter] & 0xff);
-						uns_buf1 = (int) (byteptr[counter + 1] & 0xff);
+						uns_buf0 = byteptr[counter];
+						uns_buf1 = byteptr[counter + 1];
 						dpp.samples_B[m] = WordsUtils.exp2s((short) (uns_buf0 + (uns_buf1 << 8)));
 						counter += 2;
 					}
