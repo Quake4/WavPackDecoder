@@ -163,40 +163,35 @@ public class WvDemo
 		switch (bps)
 		{
 			case 1:
-				while (samcnt > 0)
-				{
+				while (samcnt-- > 0)
 					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter] + 128));
-					samcnt--;
-				}
 				break;
 
 			case 2:
-				while (samcnt > 0)
+				while (samcnt-- > 0)
 				{
 					temp = src[counter2];
 					pcm_buffer[counter++] = (byte)temp;
 					pcm_buffer[counter++] = (byte)(temp >> 8);
 					counter2++;
-					samcnt--;
 				}
 
 				break;
 
 			case 3:
-				while (samcnt > 0)
+				while (samcnt-- > 0)
 				{
 					temp = src[counter2];
 					pcm_buffer[counter++] = (byte)temp;
 					pcm_buffer[counter++] = (byte)(temp >> 8);
 					pcm_buffer[counter++] = (byte)(temp >> 16);
 					counter2++;
-					samcnt--;
 				}
 
 				break;
 
 			case 4:
-				while (samcnt > 0)
+				while (samcnt-- > 0)
 				{
 					temp = src[counter2];
 					pcm_buffer[counter++] = (byte)temp;
@@ -204,7 +199,6 @@ public class WvDemo
 					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 16);
 					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24);
 					counter2++;
-					samcnt--;
 				}
 
 				break;
