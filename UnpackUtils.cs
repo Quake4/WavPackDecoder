@@ -247,7 +247,6 @@ class UnpackUtils
 			}
 			else if (dpp.term < 0)
 			{
-				
 				uns_buf0 = byteptr[counter];
 				uns_buf1 = byteptr[counter + 1];
 				uns_buf2 = byteptr[counter + 2];
@@ -461,13 +460,9 @@ class UnpackUtils
 			long tempc;
 			
 			if ((flags & Defines.MONO_FLAG) > 0)
-			{
 				tempc = sample_count;
-			}
 			else
-			{
 				tempc = 2 * sample_count;
-			}
 			
 			buffer_counter = bufferStartPos;
 			while (tempc-- > 0)
@@ -587,13 +582,9 @@ class UnpackUtils
 			long sc = 0;
 			
 			if ((flags & Defines.MONO_FLAG) > 0)
-			{
 				sc = sample_count;
-			}
 			else
-			{
 				sc = 2 * sample_count;
-			}
 
 			buffer_counter = bufferStartPos;
 			while (sc-- > 0)
@@ -611,17 +602,11 @@ class UnpackUtils
 			int src_idx = (int) i;
 			int c = (int) i;
 			
-			dest_idx--;
-			src_idx--;
-			
-			while (c > 0)
+			while (c-- > 0)
 			{
-				buffer[dest_idx + bufferStartPos] = buffer[src_idx + bufferStartPos];
-				dest_idx--;
-				buffer[dest_idx + bufferStartPos] = buffer[src_idx + bufferStartPos];
-				dest_idx--;
 				src_idx--;
-				c--;
+				buffer[--dest_idx + bufferStartPos] = buffer[src_idx + bufferStartPos];
+				buffer[--dest_idx + bufferStartPos] = buffer[src_idx + bufferStartPos];
 			}
 		}
 		
@@ -653,13 +638,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					
 					buffer[bptr_counter] = dpp.samples_A[0];
@@ -671,13 +652,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter + 1] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter + 1]) < 0)
-						{
-							weight_B = weight_B - delta;
-						}
+							weight_B -= delta;
 						else
-						{
-							weight_B = weight_B + delta;
-						}
+							weight_B += delta;
 					}
 					
 					buffer[bptr_counter + 1] = dpp.samples_B[0];
@@ -697,13 +674,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					
 					buffer[bptr_counter] = dpp.samples_A[0];
@@ -715,13 +688,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter + 1] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter + 1]) < 0)
-						{
-							weight_B = weight_B - delta;
-						}
+							weight_B -= delta;
 						else
-						{
-							weight_B = weight_B + delta;
-						}
+							weight_B += delta;
 					}
 					
 					buffer[bptr_counter + 1] = dpp.samples_B[0];
@@ -738,30 +707,12 @@ class UnpackUtils
 					if ((dpp.samples_A[0] ^ buffer[bptr_counter]) < 0)
 					{
 						if (dpp.samples_A[0] != 0 && buffer[bptr_counter] != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (dpp.samples_A[0] != 0 && buffer[bptr_counter] != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					
 					buffer[bptr_counter] = sam_A;
@@ -770,32 +721,14 @@ class UnpackUtils
 					if ((sam_A ^ buffer[bptr_counter + 1]) < 0)
 					{
 						if (sam_A != 0 && buffer[bptr_counter + 1] != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (sam_A != 0 && buffer[bptr_counter + 1] != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
-					
+
 					buffer[bptr_counter + 1] = dpp.samples_A[0];
 				}
 				
@@ -813,32 +746,14 @@ class UnpackUtils
 					if ((dpp.samples_B[0] ^ buffer[bptr_counter + 1]) < 0)
 					{
 						if (dpp.samples_B[0] != 0 && buffer[bptr_counter + 1] != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (dpp.samples_B[0] != 0 && buffer[bptr_counter + 1] != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
-					
+
 					buffer[bptr_counter + 1] = sam_B;
 					
 					dpp.samples_B[0] = buffer[bptr_counter] + (int) ((weight_A * (long) sam_B + 512) >> 10);
@@ -846,30 +761,12 @@ class UnpackUtils
 					if ((sam_B ^ buffer[bptr_counter]) < 0)
 					{
 						if (sam_B != 0 && buffer[bptr_counter] != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (sam_B != 0 && buffer[bptr_counter] != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					buffer[bptr_counter] = dpp.samples_B[0];
 				}
@@ -887,64 +784,28 @@ class UnpackUtils
 					if ((dpp.samples_A[0] ^ buffer[bptr_counter]) < 0)
 					{
 						if (dpp.samples_A[0] != 0 && buffer[bptr_counter] != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 
 					{
 						if (dpp.samples_A[0] != 0 && buffer[bptr_counter] != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
-					
+
 					sam_B = buffer[bptr_counter + 1] + (int) ((weight_B * (long) dpp.samples_B[0] + 512) >> 10);
 					
 					if ((dpp.samples_B[0] ^ buffer[bptr_counter + 1]) < 0)
 					{
 						if (dpp.samples_B[0] != 0 && buffer[bptr_counter + 1] != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (dpp.samples_B[0] != 0 && buffer[bptr_counter + 1] != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
-					
+
 					buffer[bptr_counter] = dpp.samples_B[0] = sam_A;
 					buffer[bptr_counter + 1] = dpp.samples_A[0] = sam_B;
 				}
@@ -953,7 +814,6 @@ class UnpackUtils
 			
 			
 			default: 
-				
 				sam_A = 0;
 				
 				for (m = 0, k = dpp.term & (Defines.MAX_TERM - 1), bptr_counter = buf_idx; bptr_counter < buf_idx + sample_count * 2; bptr_counter += 2)
@@ -964,13 +824,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					
 					buffer[bptr_counter] = dpp.samples_A[k];
@@ -981,13 +837,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter + 1] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter + 1]) < 0)
-						{
-							weight_B = weight_B - delta;
-						}
+							weight_B -= delta;
 						else
-						{
-							weight_B = weight_B + delta;
-						}
+							weight_B += delta;
 					}
 					
 					buffer[bptr_counter + 1] = dpp.samples_B[k];
@@ -1360,13 +1212,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					buffer[bptr_counter] = dpp.samples_A[0];
 				}
@@ -1384,13 +1232,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					buffer[bptr_counter] = dpp.samples_A[0];
 				}
@@ -1407,13 +1251,9 @@ class UnpackUtils
 					if (sam_A != 0 && buffer[bptr_counter] != 0)
 					{
 						if ((sam_A ^ buffer[bptr_counter]) < 0)
-						{
-							weight_A = weight_A - delta;
-						}
+							weight_A -= delta;
 						else
-						{
-							weight_A = weight_A + delta;
-						}
+							weight_A += delta;
 					}
 					
 					buffer[bptr_counter] = dpp.samples_A[k];
