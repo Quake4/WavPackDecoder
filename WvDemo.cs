@@ -164,7 +164,7 @@ public class WvDemo
 		{
 			case 1:
 				while (samcnt-- > 0)
-					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter] + 128));
+					pcm_buffer[counter] = (byte)(0x00FF & (src[counter++] + 128));
 				break;
 
 			case 2:
