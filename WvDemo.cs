@@ -16,8 +16,8 @@ public class WvDemo
 	public static int Main(string[] args)
 	{
 		long total_unpacked_samples = 0;
-		WavpackContext wpc = new WavpackContext();
-		System.IO.FileStream fistream = null;
+		WavpackContext wpc;
+		System.IO.FileStream fistream;
 		System.IO.BinaryReader reader;
 		
 		string inputWVFile = args.Length > 0 ? args[0] : "input.wv";
@@ -58,7 +58,7 @@ public class WvDemo
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
-		System.Console.Out.WriteLine(lossy ? "Lossy" : "Losseless");
+		System.Console.Out.WriteLine((lossy ? "Lossy" : "Losseless") + " decoding");
 
 		try
 		{

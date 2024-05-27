@@ -75,7 +75,7 @@ public class Defines
 	//internal const byte ID_ALT_MD5_CHECKSUM = ID_OPTIONAL_DATA | 0x9;
 	internal const byte ID_NEW_CONFIG_BLOCK = ID_OPTIONAL_DATA | 0xa;
 	//internal const byte ID_CHANNEL_IDENTITIES = ID_OPTIONAL_DATA | 0xb;
-	//internal const byte ID_WVX_NEW_BITSTREAM = ID_OPTIONAL_DATA | ID_WVX_BITSTREAM;
+	internal const byte ID_WVX_NEW_BITSTREAM = ID_OPTIONAL_DATA | ID_WVX_BITSTREAM;
 	internal const byte ID_BLOCK_CHECKSUM = ID_OPTIONAL_DATA | 0xf;
 
 

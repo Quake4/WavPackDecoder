@@ -21,17 +21,21 @@ class WavpackStream
 	}
 	internal WavpackHeader wphdr = new WavpackHeader();
 	internal Bitstream wvbits = new Bitstream();
-	
+	internal Bitstream wvcbits;
+	internal Bitstream wvxbits;
+
 	internal words_data w = new words_data();
 	
 	internal int num_terms = 0;
 	internal int mute_error;
-	internal int crc;
+	internal int crc/*, crc_x*/, crc_mvx;
 	internal long sample_index; // was uint32_t in C
 	
 	internal short int32_sent_bits, int32_zeros, int32_ones, int32_dups; // was uchar in C
 	internal short float_flags, float_shift, float_max_exp, float_norm_exp; // was uchar in C
-	
+	internal byte int32_max_width;
+	internal byte float_min_shifted_zeros, float_max_shifted_ones;
+
 	internal decorr_pass dp1 = new decorr_pass();
 	internal decorr_pass dp2 = new decorr_pass();
 	internal decorr_pass dp3 = new decorr_pass();

@@ -46,13 +46,13 @@ public class WavPackUtils
 		{
 			wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
 			
-			if (wps.wphdr.status == 1)
+			if (wps.wphdr.error)
 			{
 				wpc.error_message = "not compatible with this version of WavPack file!";
 				return wpc;
 			}
 			
-			if (wps.wphdr.block_samples > 0 && wps.wphdr.total_samples != - 1)
+			if (wps.wphdr.block_samples > 0 && wps.wphdr.total_samples != 0xFFFFFFFF)
 				wpc.total_samples = wps.wphdr.total_samples;
 			
 			// lets put the stream back in the context
@@ -108,14 +108,7 @@ public class WavPackUtils
 			wpc.error_message = "only two channels supported!";
 			return wpc;
 		}
-		/*
-		// need fix 32bit decoding
-		if (wpc.file_format == eFileFormat.WAV && wpc.config.bits_per_sample == 32 && (wpc.config.flags & Defines.FLOAT_DATA) == 0)
-		{
-			wpc.error_message = "PCM 32 bit doesn't supported!";
-			return wpc;
-		}
-		*/
+
 		return wpc;
 	}
 	
@@ -134,25 +127,22 @@ public class WavPackUtils
 	{
 		int mode = 0;
 		
-		if (null != wpc)
-		{
-			if ((wpc.config.flags & Defines.CONFIG_HYBRID_FLAG) != 0)
-				mode |= Defines.MODE_HYBRID;
-			else if ((wpc.config.flags & Defines.CONFIG_LOSSY_MODE) == 0)
-				mode |= Defines.MODE_LOSSLESS;
+		if ((wpc.config.flags & Defines.CONFIG_HYBRID_FLAG) != 0)
+			mode |= Defines.MODE_HYBRID;
+		else if ((wpc.config.flags & Defines.CONFIG_LOSSY_MODE) == 0)
+			mode |= Defines.MODE_LOSSLESS;
 			
-			if (wpc.lossy_blocks)
-				mode &= ~ Defines.MODE_LOSSLESS;
+		if (wpc.lossy_blocks)
+			mode &= ~ Defines.MODE_LOSSLESS;
 			
-			if ((wpc.config.flags & Defines.CONFIG_FLOAT_DATA) != 0)
-				mode |= Defines.MODE_FLOAT;
+		if ((wpc.config.flags & Defines.CONFIG_FLOAT_DATA) != 0)
+			mode |= Defines.MODE_FLOAT;
 			
-			if ((wpc.config.flags & Defines.CONFIG_HIGH_FLAG) != 0)
-				mode |= Defines.MODE_HIGH;
+		if ((wpc.config.flags & Defines.CONFIG_HIGH_FLAG) != 0)
+			mode |= Defines.MODE_HIGH;
 			
-			if ((wpc.config.flags & Defines.CONFIG_FAST_FLAG) != 0)
-				mode |= Defines.MODE_FAST;
-		}
+		if ((wpc.config.flags & Defines.CONFIG_FAST_FLAG) != 0)
+			mode |= Defines.MODE_FAST;
 		
 		return mode;
 	}
@@ -184,7 +174,7 @@ public class WavPackUtils
 			{
 				wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
 				
-				if (wps.wphdr.status == 1)
+				if (wps.wphdr.error)
 					break;
 				
 				if (wps.wphdr.block_samples == 0 || wps.sample_index == wps.wphdr.block_index)
@@ -244,7 +234,7 @@ public class WavPackUtils
 			samples -= samples_to_unpack;
 			
 			if (wps.sample_index == wps.wphdr.block_index + wps.wphdr.block_samples)
-				if (UnpackUtils.check_crc_error(wpc) > 0)
+				if (UnpackUtils.check_crc_error(wpc))
 					wpc.crc_errors++;
 			
 			if (wps.sample_index == wpc.total_samples)
@@ -253,8 +243,6 @@ public class WavPackUtils
 		
 		return samples_unpacked;
 	}
-
-
 	
 	
 	// Get total number of samples contained in the WavPack file, or -1 if unknown
@@ -262,15 +250,7 @@ public class WavPackUtils
 	internal static long WavpackGetNumSamples(WavpackContext wpc)
 	{
 		// -1 would mean an unknown number of samples
-		
-		if (null != wpc)
-		{
-			return (wpc.total_samples);
-		}
-		else
-		{
-			return -1;
-		}
+		return wpc.total_samples;
 	}
 	
 	
@@ -278,10 +258,7 @@ public class WavPackUtils
 	
 	internal static long WavpackGetSampleIndex(WavpackContext wpc)
 	{
-		if (null != wpc)
-			return wpc.stream.sample_index;
-		
-		return -1;
+		return wpc.stream.sample_index;
 	}
 	
 	
@@ -290,14 +267,7 @@ public class WavPackUtils
 	
 	internal static long WavpackGetNumErrors(WavpackContext wpc)
 	{
-		if (null != wpc)
-		{
-			return wpc.crc_errors;
-		}
-		else
-		{
-			return 0;
-		}
+		return wpc.crc_errors;
 	}
 	
 	
@@ -305,14 +275,7 @@ public class WavPackUtils
 	
 	internal static bool WavpackLossyBlocks(WavpackContext wpc)
 	{
-		if (null != wpc)
-		{
-			return wpc.lossy_blocks;
-		}
-		else
-		{
-			return false;
-		}
+		return wpc.lossy_blocks;
 	}
 	
 	
@@ -321,14 +284,10 @@ public class WavPackUtils
 	
 	internal static long WavpackGetSampleRate(WavpackContext wpc)
 	{
-		if (null != wpc && wpc.config.sample_rate != 0)
-		{
+		if (wpc.config.sample_rate != 0)
 			return wpc.config.sample_rate;
-		}
 		else
-		{
 			return 44100;
-		}
 	}
 	
 	
@@ -338,14 +297,10 @@ public class WavPackUtils
 	
 	internal static int WavpackGetNumChannels(WavpackContext wpc)
 	{
-		if (null != wpc && wpc.config.num_channels != 0)
-		{
+		if (wpc.config.num_channels != 0)
 			return wpc.config.num_channels;
-		}
 		else
-		{
 			return 2;
-		}
 	}
 	
 	
@@ -359,14 +314,10 @@ public class WavPackUtils
 	
 	internal static int WavpackGetBitsPerSample(WavpackContext wpc)
 	{
-		if (null != wpc && wpc.config.bits_per_sample != 0)
-		{
+		if (wpc.config.bits_per_sample != 0)
 			return wpc.config.bits_per_sample;
-		}
 		else
-		{
 			return 16;
-		}
 	}
 	
 	
@@ -377,14 +328,10 @@ public class WavPackUtils
 	
 	internal static int WavpackGetBytesPerSample(WavpackContext wpc)
 	{
-		if (null != wpc && wpc.config.bytes_per_sample != 0)
-		{
+		if (wpc.config.bytes_per_sample != 0)
 			return wpc.config.bytes_per_sample;
-		}
 		else
-		{
 			return 2;
-		}
 	}
 	
 	
@@ -395,18 +342,12 @@ public class WavPackUtils
 	
 	internal static int WavpackGetReducedChannels(WavpackContext wpc)
 	{
-		if (null != wpc && wpc.reduced_channels != 0)
-		{
+		if (wpc.reduced_channels != 0)
 			return wpc.reduced_channels;
-		}
-		else if (null != wpc && wpc.config.num_channels != 0)
-		{
+		else if (wpc.config.num_channels != 0)
 			return wpc.config.num_channels;
-		}
 		else
-		{
 			return 2;
-		}
 	}
 
 
@@ -427,7 +368,7 @@ public class WavPackUtils
 
 	public static string WavpackGetFileExtension(WavpackContext wpc)
 	{
-		if (wpc != null && wpc.file_extension != null)
+		if (wpc.file_extension != null)
 			return wpc.file_extension;
 		else
 			return "wav";
@@ -500,7 +441,7 @@ public class WavPackUtils
                 long temppos = infile.BaseStream.Position;
                 wps.wphdr = read_next_header(infile, wps.wphdr);
 
-                if (wps.wphdr.status == 1 || seek_pos >= file_pos2)
+                if (wps.wphdr.error || seek_pos >= file_pos2)
                 {
                     if (ratio > 0.0)
                     {
@@ -574,13 +515,13 @@ public class WavPackUtils
 			{
 				if (infile.BaseStream.Read(temp, 0, 32 - bleft) != 32 - bleft)
 				{
-					wphdr.status = 1;
+					wphdr.error = true;
 					return wphdr;
 				}
 			}
 			catch (System.Exception)
 			{
-				wphdr.status = 1;
+				wphdr.error = true;
 				return wphdr;
 			}
 			
@@ -593,48 +534,17 @@ public class WavPackUtils
 			
 			if (buffer[0] == 'w' && buffer[1] == 'v' && buffer[2] == 'p' && buffer[3] == 'k' && (buffer[4] & 1) == 0 && buffer[6] < 16 && buffer[7] == 0 && buffer[9] == 4 && buffer[8] >= (Defines.MIN_STREAM_VERS & 0xff) && buffer[8] <= (Defines.MAX_STREAM_VERS & 0xff))
 			{
-				wphdr.ckID[0] = 'w';
-				wphdr.ckID[1] = 'v';
-				wphdr.ckID[2] = 'p';
-				wphdr.ckID[3] = 'k';
-				
-				wphdr.ckSize = (long) ((buffer[7] & 0xFF) << 24);
-				wphdr.ckSize += (long) ((buffer[6] & 0xFF) << 16);
-				wphdr.ckSize += (long) ((buffer[5] & 0xFF) << 8);
-				wphdr.ckSize += (long) (buffer[4] & 0xFF);
-				
-				wphdr.version = (short) (buffer[9] << 8);
-				wphdr.version = (short) (wphdr.version + (short) (buffer[8]));
-				
+				wphdr.ckSize = (uint)((buffer[7] << 24) | (buffer[6] << 16) | (buffer[5] << 8) | buffer[4]);
+				wphdr.version = (short)((buffer[9] << 8) | buffer[8]);
 				wphdr.track_no = buffer[10];
 				wphdr.index_no = buffer[11];
+				wphdr.total_samples = (uint)((buffer[15] << 24) | (buffer[14] << 16) | (buffer[13] << 8) | buffer[12]);
+				wphdr.block_index = (uint)((buffer[19] << 24) | (buffer[18] << 16) | (buffer[17] << 8) | buffer[16]);
+				wphdr.block_samples = (uint)((buffer[23] << 24) | (buffer[22] << 16) | (buffer[21] << 8) | buffer[20]);
+				wphdr.flags = (uint)((buffer[27] << 24) | (buffer[26] << 16) | (buffer[25] << 8) | buffer[24]);
+				wphdr.crc = (buffer[31] << 24) | (buffer[30] << 16) | (buffer[29] << 8) | buffer[28];
 				
-				wphdr.total_samples = (long) ((buffer[15] & 0xFF) << 24);
-				wphdr.total_samples += (long) ((buffer[14] & 0xFF) << 16);
-				wphdr.total_samples += (long) ((buffer[13] & 0xFF) << 8);
-				wphdr.total_samples += (long) (buffer[12] & 0xFF);
-				
-				wphdr.block_index = (long) ((buffer[19] & 0xFF) << 24);
-				wphdr.block_index += (long) ((buffer[18] & 0xFF) << 16);
-				wphdr.block_index += (long) ((buffer[17] & 0xFF) << 8);
-				wphdr.block_index += ((long) (buffer[16]) & 0xFF);
-				
-				wphdr.block_samples = (long) ((buffer[23] & 0xFF) << 24);
-				wphdr.block_samples += (long) ((buffer[22] & 0xFF) << 16);
-				wphdr.block_samples += (long) ((buffer[21] & 0xFF) << 8);
-				wphdr.block_samples += (long) (buffer[20] & 0xFF);
-				
-				wphdr.flags = (long) ((buffer[27] & 0xFF) << 24);
-				wphdr.flags += (long) ((buffer[26] & 0xFF) << 16);
-				wphdr.flags += (long) ((buffer[25] & 0xFF) << 8);
-				wphdr.flags += (long) (buffer[24] & 0xFF);
-				
-				wphdr.crc = (long) ((buffer[31] & 0xFF) << 24);
-				wphdr.crc += (long) ((buffer[30] & 0xFF) << 16);
-				wphdr.crc += (long) ((buffer[29] & 0xFF) << 8);
-				wphdr.crc += (long) (buffer[28] & 0xFF);
-				
-				wphdr.status = 0;
+				wphdr.error = false;
 				
 				return wphdr;
 			}
@@ -654,7 +564,7 @@ public class WavPackUtils
 			
 			if (bytes_skipped > 1048576L)
 			{
-				wphdr.status = 1;
+				wphdr.error = true;
 				return wphdr;
 			}
 		}

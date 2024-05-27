@@ -1,4 +1,3 @@
-using System;
 /*
 ** Bitstream.cs
 **
@@ -11,7 +10,7 @@ using System;
 
 class Bitstream
 {
-	internal short end, ptr; // was uchar in c
+	internal int end, ptr; // was uchar in c
 	internal uint sr;
 	internal int file_bytes;
 	internal int error, bc;

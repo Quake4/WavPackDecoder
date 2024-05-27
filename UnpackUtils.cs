@@ -24,7 +24,7 @@ class UnpackUtils
 		WavpackStream wps = wpc.stream;
 		WavpackMetadata wpmd = new WavpackMetadata();
 		
-		if (wps.wphdr.block_samples > 0 && wps.wphdr.block_index != - 1)
+		if (wps.wphdr.block_samples > 0 && wps.wphdr.block_index != 0xFFFFFFFF)
 			wps.sample_index = wps.wphdr.block_index;
 		
 		wps.mute_error = 0;
@@ -35,20 +35,17 @@ class UnpackUtils
 		{
 			if (MetadataUtils.process_metadata(wpc, wpmd) == Defines.FALSE)
 			{
-				wpc.error_message = "invalid metadata!";
+				wpc.error_message = "invalid metadata id " + wpmd.id;
 				return Defines.FALSE;
 			}
-			
-			if (wpmd.id == Defines.ID_WV_BITSTREAM)
-				break;
 		}
-		
-		if (wps.wphdr.block_samples != 0 && (null == wps.wvbits.file))
+
+		if (wps.wphdr.block_samples != 0 && wps.wvbits.end == 0)
 		{
-			wpc.error_message = "invalid WavPack file!";
+			wpc.error_message = "invalid WavPack file";
 			return Defines.FALSE;
 		}
-		
+
 		if (wps.wphdr.block_samples != 0)
 		{
 			if ((wps.wphdr.flags & Defines.INT32_DATA) != 0 && wps.int32_sent_bits != 0)
@@ -62,6 +59,7 @@ class UnpackUtils
 		return Defines.TRUE;
 	}
 	
+
 	// This function initialzes the main bitstream for audio samples, which must
 	// be in the "wv" file.
 	
@@ -70,24 +68,80 @@ class UnpackUtils
 		WavpackStream wps = wpc.stream;
 		
 		if (wpmd.hasdata)
-			wps.wvbits = BitsUtils.bs_open_read(wpmd.data, (short) 0, (short) wpmd.byte_length, wpc.infile, 0, 0);
+			wps.wvbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
 		else if (wpmd.byte_length > 0)
 		{
 			int len = wpmd.byte_length & 1;
-			wps.wvbits = BitsUtils.bs_open_read(wpc.read_buffer, (short) (- 1), (short) wpc.read_buffer.Length, wpc.infile, (wpmd.byte_length + len), 1);
+			wps.wvbits = BitsUtils.bs_open_read(wpc.read_buffer, -1, wpc.read_buffer.Length, wpc.infile, wpmd.byte_length + len, 1);
 		}
 		
 		return Defines.TRUE;
 	}
-	
-	
+
+
+	// This function initializes the "correction" bitstream for audio samples,
+	// which currently must be in the "wvc" file.
+
+	internal static int init_wvc_bitstream(WavpackContext wpc, WavpackMetadata wpmd)
+	{
+		WavpackStream wps = wpc.stream;
+
+		if (wpmd.byte_length == 0 || (wpmd.byte_length & 1) > 0)
+			return Defines.FALSE;
+
+		wps.wvcbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
+
+		return Defines.TRUE;
+	}
+
+	// This function initializes the "extra" bitstream for audio samples which
+	// contains the information required to losslessly decompress 32-bit float data
+	// or integer data that exceeds 24 bits. This bitstream is in the "wv" file
+	// for pure lossless data or the "wvc" file for hybrid lossless. This data
+	// would not be used for hybrid lossy mode. There is also a 32-bit CRC stored
+	// in the first 4 bytes of these blocks.
+
+	internal static int init_wvx_bitstream(WavpackContext wpc, WavpackMetadata wpmd)
+	{
+		WavpackStream wps = wpc.stream;
+
+		int counter = 0;
+
+		if (wpmd.byte_length <= 4 || (wpmd.byte_length & 1) > 0)
+			return Defines.FALSE;
+
+		var cp = wpmd.data[counter++];
+		wps.crc_mvx = cp;
+		wps.crc_mvx |= wpmd.data[counter++] << 8;
+		wps.crc_mvx |= wpmd.data[counter++] << 16;
+		wps.crc_mvx |= wpmd.data[counter++] << 24;
+
+		wps.wvxbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
+
+		// the new WVX bitstream format starts with one or two new 5-bit fields
+		if (wpmd.id == Defines.ID_WVX_NEW_BITSTREAM)
+		{
+			if ((wps.wphdr.flags & Defines.FLOAT_DATA) > 0)
+			{
+				wps.float_min_shifted_zeros = (byte)(BitsUtils.getbits(5, wps.wvxbits) & 0x1f);
+				wps.float_max_shifted_ones = (byte)(BitsUtils.getbits(5, wps.wvxbits) & 0x1f);
+			}
+			else
+			{
+				wps.int32_max_width = (byte)(BitsUtils.getbits(5, wps.wvxbits) & 0x1f);
+			}
+		}
+
+		return Defines.TRUE;
+	}
+
 	// Read decorrelation terms from specified metadata block into the
 	// decorr_passes array. The terms range from -3 to 8, plus 17 & 18;
 	// other values are reserved and generate errors for now. The delta
 	// ranges from 0 to 7 with all values valid. Note that the terms are
 	// stored in the opposite order in the decorr_passes array compared
 	// to packing.
-	
+
 	internal static int read_decorr_terms(WavpackStream wps, WavpackMetadata wpmd)
 	{
 		int termcnt = wpmd.byte_length;
@@ -947,61 +1001,25 @@ class UnpackUtils
 					if ((buffer[buffer_index - 1] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
-					
+
 					buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[buffer_index] + 512) >> 10) + (sam_A = buffer[buffer_index + 1]);
 					
 					if ((buffer[buffer_index] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index] != 0 && sam_A != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index] != 0 && sam_A != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 				}
 				
@@ -1021,61 +1039,25 @@ class UnpackUtils
 					if ((buffer[buffer_index - 2] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
-					
+
 					buffer[buffer_index] = (int) ((weight_A * (long) buffer[buffer_index + 1] + 512) >> 10) + (sam_A = buffer[buffer_index]);
 					
 					if ((buffer[buffer_index + 1] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index + 1] != 0 && sam_A != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index + 1] != 0 && sam_A != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 				}
 				
@@ -1092,30 +1074,12 @@ class UnpackUtils
 					if ((buffer[buffer_index - 1] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A -= delta) < - 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A += delta) > 1024)
-						{
-							if (weight_A < 0)
-							{
-								weight_A = - 1024;
-							}
-							else
-							{
-								weight_A = 1024;
-							}
-						}
+							weight_A = (weight_A < 0) ? -1024 : 1024;
 					}
 					
 					buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[buffer_index - 2] + 512) >> 10) + (sam_A = buffer[buffer_index + 1]);
@@ -1123,30 +1087,12 @@ class UnpackUtils
 					if ((buffer[buffer_index - 2] ^ sam_A) < 0)
 					{
 						if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B -= delta) < - 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 					else
 					{
 						if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B += delta) > 1024)
-						{
-							if (weight_B < 0)
-							{
-								weight_B = - 1024;
-							}
-							else
-							{
-								weight_B = 1024;
-							}
-						}
+							weight_B = (weight_B < 0) ? -1024 : 1024;
 					}
 				}
 				
@@ -1297,13 +1243,9 @@ class UnpackUtils
 			long sc = 0;
 			
 			if ((flags & Defines.MONO_FLAG) > 0)
-			{
 				sc = sample_count;
-			}
 			else
-			{
 				sc = sample_count * 2;
-			}
 			
 			buffer = FloatUtils.float_values(wps, buffer, sc, bufferStartPos);
 		}
@@ -1317,13 +1259,9 @@ class UnpackUtils
 			long count;
 			
 			if ((flags & Defines.MONO_FLAG) > 0)
-			{
 				count = sample_count;
-			}
 			else
-			{
 				count = sample_count * 2;
-			}
 			
 			if ((flags & Defines.HYBRID_FLAG) == 0 && sent_bits == 0 && (zeros + ones + dups) != 0)
 				while (count > 0)
@@ -1409,16 +1347,10 @@ class UnpackUtils
 	// Note that WavPack's crc is not a CCITT approved polynomial algorithm, but
 	// is a much simpler method that is virtually as robust for real world data.
 	
-	internal static int check_crc_error(WavpackContext wpc)
+	internal static bool check_crc_error(WavpackContext wpc)
 	{
 		WavpackStream wps = wpc.stream;
-		int result = 0;
-		
-		if (wps.crc != wps.wphdr.crc)
-		{
-			++result;
-		}
-		
-		return result;
+
+		return wps.crc != wps.wphdr.crc;
 	}
 }

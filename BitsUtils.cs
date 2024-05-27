@@ -72,7 +72,7 @@ class BitsUtils
 		return (retval);
 	}
 	
-	internal static Bitstream bs_open_read(byte[] stream, short buffer_start, short buffer_end, System.IO.BinaryReader file, int file_bytes, int passed)
+	internal static Bitstream bs_open_read(byte[] stream, int buffer_start, int buffer_end, System.IO.BinaryReader file, int file_bytes, int passed)
 	{
 		//   CLEAR (*bs);
 		Bitstream bs = new Bitstream();
@@ -103,10 +103,9 @@ class BitsUtils
 	{
 		if (bs.file_bytes > 0)
 		{
-			int bytes_to_read;
 			int bytes_read;
 			
-			bytes_to_read = Defines.BITSTREAM_BUFFER_SIZE;
+			var bytes_to_read = Defines.BITSTREAM_BUFFER_SIZE;
 			
 			if (bytes_to_read > bs.file_bytes)
 				bytes_to_read = bs.file_bytes;
