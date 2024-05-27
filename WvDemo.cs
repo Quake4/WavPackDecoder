@@ -195,9 +195,9 @@ public class WvDemo
 				{
 					temp = src[counter2];
 					pcm_buffer[counter++] = (byte)temp;
-					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 8);
-					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 16);
-					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24);
+					pcm_buffer[counter++] = (byte)(temp >> 8);
+					pcm_buffer[counter++] = (byte)(temp >> 16);
+					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24); // with sign
 					counter2++;
 				}
 
