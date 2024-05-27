@@ -109,6 +109,7 @@ public class WavPackUtils
 			return wpc;
 		}
 #if !DEBUG
+		// need fix 32bit decoding
 		if (wpc.file_format == eFileFormat.WAV && wpc.config.bits_per_sample == 32 && (wpc.config.flags & Defines.FLOAT_DATA) == 0)
 		{
 			wpc.error_message = "PCM 32 bit doesn't supported!";
