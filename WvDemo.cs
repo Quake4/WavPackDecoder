@@ -51,12 +51,14 @@ public class WvDemo
 		int block_align = byteps * num_channels;
 		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
+		var lossy = WavPackUtils.WavpackLossyBlocks(wpc);
 
 		System.Console.Out.WriteLine("The WavPack " + (wpc.five ? "5" : "4") + " file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
 		System.Console.Out.WriteLine(wpc.file_format + " format");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
+		System.Console.Out.WriteLine(lossy ? "Lossy" : "Losseless");
 
 		try
 		{

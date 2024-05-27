@@ -108,14 +108,14 @@ public class WavPackUtils
 			wpc.error_message = "only two channels supported!";
 			return wpc;
 		}
-#if !DEBUG
+		/*
 		// need fix 32bit decoding
 		if (wpc.file_format == eFileFormat.WAV && wpc.config.bits_per_sample == 32 && (wpc.config.flags & Defines.FLOAT_DATA) == 0)
 		{
 			wpc.error_message = "PCM 32 bit doesn't supported!";
 			return wpc;
 		}
-#endif
+		*/
 		return wpc;
 	}
 	
@@ -141,7 +141,7 @@ public class WavPackUtils
 			else if ((wpc.config.flags & Defines.CONFIG_LOSSY_MODE) == 0)
 				mode |= Defines.MODE_LOSSLESS;
 			
-			if (wpc.lossy_blocks != 0)
+			if (wpc.lossy_blocks)
 				mode &= ~ Defines.MODE_LOSSLESS;
 			
 			if ((wpc.config.flags & Defines.CONFIG_FLOAT_DATA) != 0)
@@ -303,7 +303,7 @@ public class WavPackUtils
 	
 	// return if any uncorrected lossy blocks were actually written or read
 	
-	internal static int WavpackLossyBlocks(WavpackContext wpc)
+	internal static bool WavpackLossyBlocks(WavpackContext wpc)
 	{
 		if (null != wpc)
 		{
@@ -311,7 +311,7 @@ public class WavPackUtils
 		}
 		else
 		{
-			return 0;
+			return false;
 		}
 	}
 	

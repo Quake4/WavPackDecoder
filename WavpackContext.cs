@@ -20,7 +20,7 @@ public class WavpackContext
 	internal long total_samples, crc_errors; // was uint32_t in C
 	internal int open_flags, norm_offset;
 	internal int reduced_channels = 0;
-	internal int lossy_blocks;
+	internal bool lossy_blocks;
 	internal int status = 0; // 0 ok, 1 error
 
 	internal bool five = false;
