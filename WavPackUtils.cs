@@ -102,7 +102,19 @@ public class WavPackUtils
 			else
 				wpc.reduced_channels = 2;
 		}
-		
+
+		if (wpc.config.num_channels > 2)
+		{
+			wpc.error_message = "only two channels supported!";
+			return wpc;
+		}
+#if !DEBUG
+		if (wpc.file_format == eFileFormat.WAV && wpc.config.bits_per_sample == 32 && (wpc.config.flags & Defines.FLOAT_DATA) == 0)
+		{
+			wpc.error_message = "PCM 32 bit doesn't supported!";
+			return wpc;
+		}
+#endif
 		return wpc;
 	}
 	

@@ -58,12 +58,6 @@ public class WvDemo
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
 
-		if (num_channels > 2)
-		{
-			System.Console.Error.WriteLine("Only two channels supported");
-			return 1;
-		}
-
 		try
 		{
 			using (var fostream = new System.IO.FileStream(System.IO.Path.ChangeExtension(inputWVFile, WavPackUtils.WavpackGetFileExtension(wpc)), System.IO.FileMode.Create))
