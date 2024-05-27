@@ -164,16 +164,15 @@ public class WvDemo
 		{
 			case 1:
 				while (samcnt-- > 0)
-					pcm_buffer[counter] = (byte)(0x00FF & (src[counter++] + 128));
+					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
 				break;
 
 			case 2:
 				while (samcnt-- > 0)
 				{
-					temp = src[counter2];
+					temp = src[counter2++];
 					pcm_buffer[counter++] = (byte)temp;
 					pcm_buffer[counter++] = (byte)(temp >> 8);
-					counter2++;
 				}
 
 				break;
@@ -181,11 +180,10 @@ public class WvDemo
 			case 3:
 				while (samcnt-- > 0)
 				{
-					temp = src[counter2];
+					temp = src[counter2++];
 					pcm_buffer[counter++] = (byte)temp;
 					pcm_buffer[counter++] = (byte)(temp >> 8);
 					pcm_buffer[counter++] = (byte)(temp >> 16);
-					counter2++;
 				}
 
 				break;
@@ -193,12 +191,11 @@ public class WvDemo
 			case 4:
 				while (samcnt-- > 0)
 				{
-					temp = src[counter2];
+					temp = src[counter2++];
 					pcm_buffer[counter++] = (byte)temp;
 					pcm_buffer[counter++] = (byte)(temp >> 8);
 					pcm_buffer[counter++] = (byte)(temp >> 16);
 					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24); // with sign
-					counter2++;
 				}
 
 				break;
