@@ -13,7 +13,7 @@ public class WvDemo
 	internal static int[] temp_buffer;
 	internal static byte[] pcm_buffer;
 
-	public static void  Main(string[] args)
+	public static int Main(string[] args)
 	{
 		long total_unpacked_samples = 0;
 		WavpackContext wpc = new WavpackContext();
@@ -31,18 +31,18 @@ public class WvDemo
 		catch (System.IO.FileNotFoundException)
 		{
 			System.Console.Error.WriteLine("Input file '" + inputWVFile +"' not found");
-			System.Environment.Exit(1);
+			return 1;
 		}
 		catch (System.IO.DirectoryNotFoundException)
 		{
 			System.Console.Error.WriteLine("Input file '" + inputWVFile + "' not found - invalid directory");
-			System.Environment.Exit(1);
+			return 1;
 		}
-		
+
 		if (!string.IsNullOrEmpty(wpc.error_message))
 		{
 			System.Console.Error.WriteLine("Error: " + wpc.error_message);
-			System.Environment.Exit(1);
+			return 1;
 		}
 
 		int num_channels = WavPackUtils.WavpackGetReducedChannels(wpc);
@@ -60,7 +60,7 @@ public class WvDemo
 		if (num_channels > 2)
 		{
 			System.Console.Error.WriteLine("Only two channels supported");
-			System.Environment.Exit(1);
+			return 1;
 		}
 
 		try
@@ -128,7 +128,7 @@ public class WvDemo
 		{
 			System.Console.Error.WriteLine("Error when writing wav file, sorry: ");
 			SupportClass.WriteStackTrace(e, System.Console.Error);
-			System.Environment.Exit(1);
+			return 1;
 		}
 
 		fistream?.Dispose();
@@ -136,16 +136,16 @@ public class WvDemo
 		if ((WavPackUtils.WavpackGetNumSamples(wpc) != - 1) && (total_unpacked_samples != WavPackUtils.WavpackGetNumSamples(wpc)))
 		{
 			System.Console.Error.WriteLine("Incorrect number of samples");
-			System.Environment.Exit(1);
+			return 1;
 		}
-		
+
 		if (WavPackUtils.WavpackGetNumErrors(wpc) > 0)
 		{
 			System.Console.Error.WriteLine("CRC errors detected");
-			System.Environment.Exit(1);
+			return 1;
 		}
-		
-		System.Environment.Exit(0);
+
+		return 0;
 	}
 
 
