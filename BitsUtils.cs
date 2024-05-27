@@ -50,7 +50,7 @@ class BitsUtils
 			{
 				bs = bs_read(bs);
 			}
-			uns_buf = bs.buf[bs.buf_index] & 0xff;
+			uns_buf = bs.buf[bs.buf_index];
 			bs.sr |= (uint)(uns_buf << bs.bc);
 			
 			bs.bc += 8;

@@ -389,7 +389,7 @@ class UnpackUtils
 		
 		while (bytecnt >= 0)
 		{
-			mask |= (long) ((byteptr[counter++] & 0xFF) << shift);
+			mask |= (long) (byteptr[counter++] << shift);
 			shift += 8;
 			bytecnt--;
 		}
@@ -427,9 +427,9 @@ class UnpackUtils
 		if (bytecnt >= 3)
 		{
 			wpc.config.flags &= 0xff;
-			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 8);
-			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 16);
-			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 24);
+			wpc.config.flags |= (long) (byteptr[counter++] << 8);
+			wpc.config.flags |= (long) (byteptr[counter++] << 16);
+			wpc.config.flags |= (long) (byteptr[counter++] << 24);
 		}
 
 		if (bytecnt >= 5)
@@ -448,9 +448,9 @@ class UnpackUtils
 		
 		if (bytecnt == 3)
 		{
-			wpc.config.sample_rate = (long) (byteptr[counter++] & 0xFF);
-			wpc.config.sample_rate |= (long) ((byteptr[counter++] & 0xFF) << 8);
-			wpc.config.sample_rate |= (long) ((byteptr[counter++] & 0xFF) << 16);
+			wpc.config.sample_rate = byteptr[counter++];
+			wpc.config.sample_rate |= (long) (byteptr[counter++] << 8);
+			wpc.config.sample_rate |= (long) (byteptr[counter++] << 16);
 		}
 		
 		return Defines.TRUE;
