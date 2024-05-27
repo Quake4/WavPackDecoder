@@ -11,13 +11,13 @@
 class RiffChunkHeader : ChunkHeader
 {
     public RiffChunkHeader(uint size)
-		: base("RIFF", size)
+		: base("RIFF", size + 4) // 4 = WAVE
     {
     }
 
 	internal override byte[] AsBytes()
 	{
-		byte[] bytes = new byte[12];
+		byte[] bytes = new byte[Size + 4]; // 4 = WAVE
 
 		bytes[0] = (byte)ckID[0];
 		bytes[1] = (byte)ckID[1];

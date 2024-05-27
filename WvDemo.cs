@@ -71,17 +71,19 @@ public class WvDemo
 					fostream.Write(wpc.riff_header, 0, wpc.riff_header.Length);
 				else
 				{
-					var riffChunkHeader = new RiffChunkHeader((uint)(total_samples * block_align + 8 * 2 + 16 + 4));
+					var riffChunkHeader = new RiffChunkHeader((uint)(total_samples * block_align + 2 * ChunkHeader.Size + WaveHeader.Size));
 
-					var formatChunkHeader = new ChunkHeader("fmt ", 16);
+					var formatChunkHeader = new ChunkHeader("fmt ", WaveHeader.Size);
 
-					var waveHeader = new WaveHeader();
-					waveHeader.FormatTag = 1;
-					waveHeader.NumChannels = (ushort)num_channels;
-					waveHeader.SampleRate = (uint)sample_rate;
-					waveHeader.BlockAlign = (ushort)block_align;
-					waveHeader.BytesPerSecond = waveHeader.SampleRate * waveHeader.BlockAlign;
-					waveHeader.BitsPerSample = (ushort)bits;
+					var waveHeader = new WaveHeader()
+					{
+						FormatTag = 1,
+						NumChannels = (ushort)num_channels,
+						SampleRate = (uint)sample_rate,
+						BitsPerSample = (ushort)bits,
+						BlockAlign = (ushort)block_align,
+						BytesPerSecond = (uint)(sample_rate * block_align),
+					};
 
 					var dataChunkHeader = new ChunkHeader("data", (uint)(total_samples * block_align));
 

@@ -11,13 +11,15 @@ using System;
 
 class WaveHeader
 {
+	internal const uint Size = 16;
+
 	internal ushort FormatTag, NumChannels;
 	internal uint SampleRate, BytesPerSecond;
 	internal ushort BlockAlign, BitsPerSample;
 
 	internal byte[] AsBytes()
 	{
-		byte[] bytes = new byte[16];
+		byte[] bytes = new byte[Size];
 
 		// swap endians
 		bytes[1] = (byte)(FormatTag >> 8);

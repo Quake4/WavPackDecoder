@@ -9,6 +9,8 @@
 
 class ChunkHeader
 {
+	internal const uint Size = 8;
+
 	internal char[] ckID = new char[4];
 	internal uint ckSize;
 
@@ -23,7 +25,7 @@ class ChunkHeader
 
 	internal virtual byte[] AsBytes()
 	{
-		byte[] bytes = new byte[8];
+		byte[] bytes = new byte[Size];
 
 		bytes[0] = (byte)ckID[0];
 		bytes[1] = (byte)ckID[1];
