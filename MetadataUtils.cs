@@ -183,15 +183,29 @@ class MetadataUtils
 			case Defines.ID_WVX_BITSTREAM:
 				return Defines.TRUE;
 
+			case Defines.ID_DSD_BLOCK:
+				//???
+				return Defines.TRUE;
+
+
 			// ID_OPTIONAL_DATA
 			case Defines.ID_NEW_CONFIG_BLOCK:
 				return UnpackUtils.read_new_config_info(wpc, wpmd);
 
 			case Defines.ID_RIFF_HEADER:
-				return UnpackUtils.read_riff_header(wpc, wpmd);
+			case Defines.ID_ALT_HEADER:
+				return UnpackUtils.read_header(wpc, wpmd);
+
+			case Defines.ID_RIFF_TRAILER:
+			case Defines.ID_ALT_TRAILER:
+				return UnpackUtils.read_trailer(wpc, wpmd);
 
 			case Defines.ID_ALT_EXTENSION:
 				wpc.file_extension = System.Text.Encoding.UTF8.GetString(wpmd.data, 0, wpmd.byte_length);
+				return Defines.TRUE;
+
+			case Defines.ID_BLOCK_CHECKSUM:
+				//???
 				return Defines.TRUE;
 
 			default:

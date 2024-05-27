@@ -26,8 +26,8 @@ public class WavpackContext
 	internal bool five = false;
 
 	// optional = new
-	internal eFileFormat file_format = eFileFormat.WP_FORMAT_WAV;
+	internal eFileFormat file_format = eFileFormat.WAV;
 	internal string file_extension = null;
-	internal byte[] riff_header;
-	//internal byte[] riff_trailer;
+	internal byte[] header;
+	internal byte[] trailer;
 }

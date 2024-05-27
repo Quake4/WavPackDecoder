@@ -62,12 +62,12 @@ public class Defines
 	internal const byte ID_WVC_BITSTREAM = 0xb;
 	internal const byte ID_WVX_BITSTREAM = 0xc;
 	internal const byte ID_CHANNEL_INFO = 0xd;
-	//internal const byte ID_DSD_BLOCK = 0xe;
+	internal const byte ID_DSD_BLOCK = 0xe;
 
 	internal const byte ID_RIFF_HEADER = ID_OPTIONAL_DATA | 0x1;
 	internal const byte ID_RIFF_TRAILER = ID_OPTIONAL_DATA | 0x2;
-	//internal const byte ID_ALT_HEADER = ID_OPTIONAL_DATA | 0x3;
-	//internal const byte ID_ALT_TRAILER = ID_OPTIONAL_DATA | 0x4;
+	internal const byte ID_ALT_HEADER = ID_OPTIONAL_DATA | 0x3;
+	internal const byte ID_ALT_TRAILER = ID_OPTIONAL_DATA | 0x4;
 	internal const byte ID_CONFIG_BLOCK = ID_OPTIONAL_DATA | 0x5;
 	internal const byte ID_MD5_CHECKSUM = ID_OPTIONAL_DATA | 0x6;
 	internal const byte ID_SAMPLE_RATE = ID_OPTIONAL_DATA | 0x7;
@@ -76,10 +76,7 @@ public class Defines
 	internal const byte ID_NEW_CONFIG_BLOCK = ID_OPTIONAL_DATA | 0xa;
 	//internal const byte ID_CHANNEL_IDENTITIES = ID_OPTIONAL_DATA | 0xb;
 	//internal const byte ID_WVX_NEW_BITSTREAM = ID_OPTIONAL_DATA | ID_WVX_BITSTREAM;
-	//internal const byte ID_BLOCK_CHECKSUM = ID_OPTIONAL_DATA | 0xf;
-	// old
-	//internal const byte ID_REPLAY_GAIN = 0x23;
-	//internal const byte ID_CUESHEET = 0x24;
+	internal const byte ID_BLOCK_CHECKSUM = ID_OPTIONAL_DATA | 0xf;
 
 
 	internal const int JOINT_STEREO = 0x10; // joint stereo
@@ -142,10 +139,10 @@ public class Defines
 
 public enum eFileFormat
 {
-	WP_FORMAT_WAV = 0,       // Microsoft RIFF, including BWF and RF64 variants
-	WP_FORMAT_W64 = 1,       // Sony Wave64
-	WP_FORMAT_CAF = 2,       // Apple CoreAudio
-	WP_FORMAT_DFF = 3,       // Philips DSDIFF
-	WP_FORMAT_DSF = 4,       // Sony DSD Format
-	WP_FORMAT_AIF = 5,       // Apple AIFF
+	WAV = 0,       // Microsoft RIFF, including BWF and RF64 variants
+	W64 = 1,       // Sony Wave64
+	CAF = 2,       // Apple CoreAudio
+	DFF = 3,       // Philips DSDIFF
+	DSF = 4,       // Sony DSD Format
+	AIF = 5,       // Apple AIFF
 }

@@ -11,7 +11,6 @@ using System;
 
 class UnpackUtils
 {
-	
 	///////////////////////////// executable code ////////////////////////////////
 	
 	// This function initializes everything required to unpack a WavPack block
@@ -313,7 +312,7 @@ class UnpackUtils
 		wps.int32_sent_bits = byteptr[counter++];
 		wps.int32_zeros = byteptr[counter++];
 		wps.int32_ones = byteptr[counter++];
-		wps.int32_dups = byteptr[counter];
+		wps.int32_dups = byteptr[counter++];
 		
 		return Defines.TRUE;
 	}
@@ -377,7 +376,7 @@ class UnpackUtils
 			wpc.config.flags &= 0xff;
 			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 8);
 			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 16);
-			wpc.config.flags |= (long) ((byteptr[counter] & 0xFF) << 24);
+			wpc.config.flags |= (long) ((byteptr[counter++] & 0xFF) << 24);
 		}
 
 		if (bytecnt >= 5)
@@ -398,17 +397,26 @@ class UnpackUtils
 		{
 			wpc.config.sample_rate = (long) (byteptr[counter++] & 0xFF);
 			wpc.config.sample_rate |= (long) ((byteptr[counter++] & 0xFF) << 8);
-			wpc.config.sample_rate |= (long) ((byteptr[counter] & 0xFF) << 16);
+			wpc.config.sample_rate |= (long) ((byteptr[counter++] & 0xFF) << 16);
 		}
 		
 		return Defines.TRUE;
 	}
 
-	internal static int read_riff_header(WavpackContext wpc, WavpackMetadata wpmd)
+	internal static int read_header(WavpackContext wpc, WavpackMetadata wpmd)
 	{
 		var bytes = new byte[wpmd.byte_length];
 		Array.Copy(wpmd.data, bytes, bytes.Length);
-		wpc.riff_header = bytes;
+		wpc.header = bytes;
+
+		return Defines.TRUE;
+	}
+
+	internal static int read_trailer(WavpackContext wpc, WavpackMetadata wpmd)
+	{
+		var bytes = new byte[wpmd.byte_length];
+		Array.Copy(wpmd.data, bytes, bytes.Length);
+		wpc.trailer = bytes;
 
 		return Defines.TRUE;
 	}
@@ -462,12 +470,8 @@ class UnpackUtils
 			}
 			
 			buffer_counter = bufferStartPos;
-			while (tempc > 0)
-			{
-				buffer[buffer_counter] = 0;
-				tempc--;
-				buffer_counter++;
-			}
+			while (tempc-- > 0)
+				buffer[buffer_counter++] = 0;
 			
 			wps.sample_index += sample_count;
 			
@@ -590,14 +594,10 @@ class UnpackUtils
 			{
 				sc = 2 * sample_count;
 			}
+
 			buffer_counter = bufferStartPos;
-			
-			while (sc > 0)
-			{
-				buffer[buffer_counter] = 0;
-				sc--;
-				buffer_counter++;
-			}
+			while (sc-- > 0)
+				buffer[buffer_counter++] = 0;
 			
 			wps.mute_error = 1;
 			i = sample_count;
