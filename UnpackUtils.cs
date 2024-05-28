@@ -1409,6 +1409,8 @@ class UnpackUtils
 	{
 		WavpackStream wps = wpc.stream;
 
-		return wps.crc != wps.wphdr.crc || wps.wvxbits != null && wps.crc_x != wps.crc_mvx;
+		// float partial decode skip x crc check
+		return wps.crc != wps.wphdr.crc ||
+			(wps.wphdr.flags & Defines.FLOAT_DATA) == 0 && wps.wvxbits != null && wps.crc_x != wps.crc_mvx;
 	}
 }
