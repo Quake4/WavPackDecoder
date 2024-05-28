@@ -54,7 +54,7 @@ class UnpackUtils
 
 		if (wps.wphdr.block_samples != 0)
 		{
-			if ((wps.wphdr.flags & Defines.INT32_DATA) != 0 && wps.int32_sent_bits != 0)
+			if ((wps.wphdr.flags & Defines.INT32_DATA) != 0 && wps.int32_sent_bits != 0 && wps.wvxbits == null)
 				wpc.lossy_blocks = true;
 			
 			if ((wps.wphdr.flags & Defines.FLOAT_DATA) != 0 && (wps.float_flags & (Defines.FLOAT_EXCEPTIONS | Defines.FLOAT_ZEROS_SENT | Defines.FLOAT_SHIFT_SENT | Defines.FLOAT_SHIFT_SAME)) != 0)
