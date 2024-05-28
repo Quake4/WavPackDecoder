@@ -21,8 +21,8 @@ class words_data
 	}
 	internal long[] bitrate_delta = new long[2]; // was uint32_t  in C
 	internal long[] bitrate_acc = new long[2]; // was uint32_t  in C
-	internal long holding_one, zeros_acc; // was uint32_t  in C
-	internal int holding_zero;
+	internal long zeros_acc; // was uint32_t  in C
+	internal bool holding_one, holding_zero;
 	
 	internal entropy_data temp_ed1 = new entropy_data();
 	internal entropy_data temp_ed2 = new entropy_data();

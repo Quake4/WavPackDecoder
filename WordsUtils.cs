@@ -82,8 +82,8 @@ class WordsUtils
 			b_array[i] = byteptr[i];
 		}
 		
-		w.holding_one = 0;
-		w.holding_zero = 0;
+		w.holding_one = false;
+		w.holding_zero = false;
 		
 		if (wpmd.byte_length != 12)
 		{
@@ -299,7 +299,7 @@ class WordsUtils
 					entidx = 1;
 			}
 			
-			if ((w.c[0].median[0] & ~ 1) == 0 && w.holding_zero == 0 && w.holding_one == 0 && (w.c[1].median[0] & ~ 1) == 0)
+			if ((w.c[0].median[0] & ~ 1) == 0 && !w.holding_zero && !w.holding_one && (w.c[1].median[0] & ~ 1) == 0)
 			{
 				long mask;
 				int cbits;
@@ -348,46 +348,49 @@ class WordsUtils
 					}
 				}
 			}
-			
-			if (w.holding_zero > 0)
-				ones_count = w.holding_zero = 0;
+
+			if (w.holding_zero)
+			{
+				w.holding_zero = false;
+				ones_count = 0;
+			}
 			else
 			{
 				if (bs.bc < 8)
 				{
 					bs.ptr++;
 					bs.buf_index++;
-					
+
 					if (bs.ptr == bs.end)
 						bs = BitsUtils.bs_read(bs);
 
 					bs.sr |= (uint)(bs.buf[bs.buf_index] << bs.bc);
-					
+
 					bs.bc += 8;
 				}
 
 				byte next8 = (byte)bs.sr;
-				
+
 				if (next8 == 0xff)
 				{
 					bs.bc -= 8;
 					bs.sr >>= 8;
 
 					for (ones_count = 8; ones_count < (LIMIT_ONES + 1) && BitsUtils.getbit(bs); ++ones_count) ;
-					
+
 					if (ones_count == (LIMIT_ONES + 1))
 						break;
-					
+
 					if (ones_count == LIMIT_ONES)
 					{
 						int mask;
 						int cbits;
 
 						for (cbits = 0; cbits < 33 && BitsUtils.getbit(bs); ++cbits) ;
-						
+
 						if (cbits == 33)
 							break;
-						
+
 						if (cbits < 2)
 							ones_count = cbits;
 						else
@@ -398,7 +401,7 @@ class WordsUtils
 
 							ones_count |= mask;
 						}
-						
+
 						ones_count += LIMIT_ONES;
 					}
 				}
@@ -407,19 +410,19 @@ class WordsUtils
 					bs.bc -= (ones_count = ones_count_table[next8]) + 1;
 					bs.sr >>= ones_count + 1; // needs to be unsigned
 				}
-				
-				if (w.holding_one > 0)
+
+				if (w.holding_one)
 				{
-					w.holding_one = ones_count & 1;
+					w.holding_one = (ones_count & 1) > 0;
 					ones_count = (ones_count >> 1) + 1;
 				}
 				else
 				{
-					w.holding_one = ones_count & 1;
+					w.holding_one = (ones_count & 1) > 0;
 					ones_count >>= 1;
 				}
-				
-				w.holding_zero = (int) (~ w.holding_one & 1);
+
+				w.holding_zero = !w.holding_one;
 			}
 			
 			if ((flags & Defines.HYBRID_FLAG) > 0 && ((flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) > 0 || (csamples & 1) == 0))
