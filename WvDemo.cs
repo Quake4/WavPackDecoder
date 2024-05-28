@@ -142,9 +142,10 @@ public class WvDemo
 			return 1;
 		}
 
-		if (WavPackUtils.WavpackGetNumErrors(wpc) > 0)
+		var crc_count = WavPackUtils.WavpackGetNumErrors(wpc);
+		if (crc_count > 0)
 		{
-			System.Console.Error.WriteLine("CRC errors detected");
+			System.Console.Error.WriteLine(crc_count + " CRC errors detected");
 			return 1;
 		}
 

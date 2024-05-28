@@ -173,7 +173,7 @@ public class WavPackUtils
 			if (wps.wphdr.block_samples == 0 || (wps.wphdr.flags & Defines.INITIAL_BLOCK) == 0 || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples)
 			{
 				wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
-				
+
 				if (wps.wphdr.error)
 					break;
 				
@@ -210,7 +210,7 @@ public class WavPackUtils
 				
 				continue;
 			}
-			
+
 			samples_to_unpack = wps.wphdr.block_index + wps.wphdr.block_samples - wps.sample_index;
 			
 			if (samples_to_unpack > samples)
@@ -257,7 +257,6 @@ public class WavPackUtils
 	}
 	
 	
-	
 	// Get the number of errors encountered so far
 	
 	internal static long WavpackGetNumErrors(WavpackContext wpc)
@@ -272,7 +271,6 @@ public class WavPackUtils
 	{
 		return wpc.lossy_blocks;
 	}
-	
 	
 	
 	// Returns the sample rate of the specified WavPack file
