@@ -87,10 +87,15 @@ public class WvDemo
 
 					var dataChunkHeader = new ChunkHeader("data", (uint)(total_samples * block_align));
 
-					SupportClass.WriteOutput(fostream, riffChunkHeader.AsBytes());
-					SupportClass.WriteOutput(fostream, formatChunkHeader.AsBytes());
-					SupportClass.WriteOutput(fostream, waveHeader.AsBytes());
-					SupportClass.WriteOutput(fostream, dataChunkHeader.AsBytes());
+					void WriteOutput(byte[] bytes)
+					{
+						fostream.Write(bytes, 0, bytes.Length);
+					}
+
+					WriteOutput(riffChunkHeader.AsBytes());
+					WriteOutput(formatChunkHeader.AsBytes());
+					WriteOutput(waveHeader.AsBytes());
+					WriteOutput(dataChunkHeader.AsBytes());
 				}
 
 				var sw = new System.Diagnostics.Stopwatch();
@@ -130,7 +135,7 @@ public class WvDemo
 		catch (System.Exception e)
 		{
 			System.Console.Error.WriteLine("Error when writing wav file, sorry: ");
-			SupportClass.WriteStackTrace(e, System.Console.Error);
+			System.Console.Error.Write(e.StackTrace);
 			return 1;
 		}
 
