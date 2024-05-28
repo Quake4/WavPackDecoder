@@ -40,7 +40,13 @@ class UnpackUtils
 			}
 		}
 
-		if (wps.wphdr.block_samples != 0 && wps.wvbits.end == 0)
+		if (wpmd.bytecount != wpc.stream.wphdr.ckSize)
+		{
+			wpc.error_message = "invalid reading WavPack metadata block";
+			return Defines.FALSE;
+		}
+
+		if (wps.wphdr.block_samples != 0 && (wps.wvbits == null || wps.wvbits.end == 0))
 		{
 			wpc.error_message = "invalid WavPack file";
 			return Defines.FALSE;
