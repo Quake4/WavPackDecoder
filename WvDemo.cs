@@ -53,7 +53,10 @@ public class WvDemo
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 		var lossy = WavPackUtils.WavpackLossyBlocks(wpc);
 
-		System.Console.Out.WriteLine("The WavPack " + (wpc.five ? "5" : "4") + " file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
+		var version = wpc.stream.wphdr.version;
+
+		System.Console.Out.WriteLine("The WavPack " + (wpc.five ? "5" : "4") + " (" + (version >> 8) + "." + (version & 0xFF) + ")" +
+			" file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
 		System.Console.Out.WriteLine(wpc.file_format + " format");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
