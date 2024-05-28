@@ -44,10 +44,10 @@ class FloatUtils
 			else if (shift < 0)
 				values[value_counter] >>= - shift;
 			
-			if (values[value_counter] > 8388607L)
-				values[value_counter] = (int) SupportClass.Identity(8388607L);
-			else if (values[value_counter] < - 8388608L)
-				values[value_counter] = (int) SupportClass.Identity(- 8388608L);
+			if (values[value_counter] > 8388607)
+				values[value_counter] = 8388607;
+			else if (values[value_counter] < -8388608)
+				values[value_counter] = -8388608;
 			
 			value_counter++;
 		}
