@@ -13,12 +13,10 @@ class MetadataUtils
 	internal static int read_metadata_buff(WavpackContext wpc, WavpackMetadata wpmd)
 	{
 		byte tchar;
-		
+
+		// we have read all the data in this block
 		if (wpmd.bytecount >= wpc.stream.wphdr.ckSize)
-		{
-			// we have read all the data in this block
 			return Defines.FALSE;
-		}
 		
 		try
 		{
@@ -186,16 +184,10 @@ class MetadataUtils
 				return Defines.TRUE;
 
 			default:
-				{
-					if ((wpmd.id & Defines.ID_OPTIONAL_DATA) != 0)
-					{
-						return Defines.TRUE;
-					}
-					else
-					{
-						return Defines.FALSE;
-					}
-				}
+				if ((wpmd.id & Defines.ID_OPTIONAL_DATA) != 0)
+					return Defines.TRUE;
+				else
+					return Defines.FALSE;
 		}
 	}
 }
