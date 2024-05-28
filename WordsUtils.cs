@@ -355,7 +355,6 @@ class WordsUtils
 			{
 				if (bs.bc < 8)
 				{
-					
 					bs.ptr++;
 					bs.buf_index++;
 					
@@ -405,8 +404,8 @@ class WordsUtils
 				}
 				else
 				{
-					bs.bc = bs.bc - ((ones_count = ones_count_table[next8]) + 1);
-					bs.sr = bs.sr >> (ones_count + 1); // needs to be unsigned
+					bs.bc -= (ones_count = ones_count_table[next8]) + 1;
+					bs.sr >>= ones_count + 1; // needs to be unsigned
 				}
 				
 				if (w.holding_one > 0)
@@ -482,23 +481,15 @@ class WordsUtils
 				while (high - low > c[entidx].error_limit)
 				{
 					if (BitsUtils.getbit(bs))
-					{
 						mid = (high + (low = mid) + 1) >> 1;
-					}
 					else
-					{
 						mid = ((high = mid - 1) + low + 1) >> 1;
-					}
 				}
 			
 			if (BitsUtils.getbit(bs))
-			{
 				buffer[buffer_counter] = (int) ~ mid;
-			}
 			else
-			{
 				buffer[buffer_counter] = (int) mid;
-			}
 			
 			buffer_counter++;
 			
@@ -509,13 +500,9 @@ class WordsUtils
 		w.c = c;
 		
 		if ((flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) != 0)
-		{
 			return csamples;
-		}
 		else
-		{
 			return (csamples / 2);
-		}
 	}
 	
 	internal static int count_bits(long av)

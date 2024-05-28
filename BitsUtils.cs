@@ -21,10 +21,9 @@ class BitsUtils
 			bs.bc = 7;
 			
 			if (bs.ptr == bs.end)
-			{
 				// wrap call here
 				bs = bs_read(bs);
-			}
+
 			bs.sr = bs.buf[bs.buf_index];
 		}
 		
@@ -35,7 +34,6 @@ class BitsUtils
 	
 	internal static long getbits(int nbits, Bitstream bs)
 	{
-		int uns_buf;
 		long retval;
 		
 		while (nbits > bs.bc)
@@ -44,11 +42,9 @@ class BitsUtils
 			bs.buf_index++;
 			
 			if (bs.ptr == bs.end)
-			{
 				bs = bs_read(bs);
-			}
-			uns_buf = bs.buf[bs.buf_index];
-			bs.sr |= (uint)(uns_buf << bs.bc);
+
+			bs.sr |= (uint)(bs.buf[bs.buf_index] << bs.bc);
 			
 			bs.bc += 8;
 		}
@@ -100,7 +96,7 @@ class BitsUtils
 		{
 			int bytes_read;
 			
-			var bytes_to_read = Defines.BITSTREAM_BUFFER_SIZE;
+			var bytes_to_read = bs.buf.Length;
 			
 			if (bytes_to_read > bs.file_bytes)
 				bytes_to_read = bs.file_bytes;
@@ -124,7 +120,7 @@ class BitsUtils
 			}
 			else
 			{
-				for (int i = 0; i < Defines.BITSTREAM_BUFFER_SIZE; i++)
+				for (int i = 0; i < bs.buf.Length; i++)
 				{
 					bs.buf[i] = unchecked((byte)-1);
 				}
@@ -135,7 +131,7 @@ class BitsUtils
 		{
 			bs.error = 1;
 			
-			for (int i = 0; i < Defines.BITSTREAM_BUFFER_SIZE; i++)
+			for (int i = 0; i < bs.buf.Length; i++)
 			{
 				bs.buf[i] = unchecked((byte)-1);
 			}
