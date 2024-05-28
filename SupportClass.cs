@@ -16,48 +16,6 @@ using System;
 /// </summary>
 public class SupportClass
 {
-
-	/*******************************/
-	/// <summary>
-	/// This method returns the literal value received
-	/// </summary>
-	/// <param name="literal">The literal to return</param>
-	/// <returns>The received value</returns>
-	public static long Identity(long literal)
-	{
-		return literal;
-	}
-
-	/// <summary>
-	/// This method returns the literal value received
-	/// </summary>
-	/// <param name="literal">The literal to return</param>
-	/// <returns>The received value</returns>
-	public static ulong Identity(ulong literal)
-	{
-		return literal;
-	}
-
-	/// <summary>
-	/// This method returns the literal value received
-	/// </summary>
-	/// <param name="literal">The literal to return</param>
-	/// <returns>The received value</returns>
-	public static float Identity(float literal)
-	{
-		return literal;
-	}
-
-	/// <summary>
-	/// This method returns the literal value received
-	/// </summary>
-	/// <param name="literal">The literal to return</param>
-	/// <returns>The received value</returns>
-	public static double Identity(double literal)
-	{
-		return literal;
-	}
-
 	/*******************************/
 	/// <summary>
 	/// Performs an unsigned bitwise right shift with the specified number
