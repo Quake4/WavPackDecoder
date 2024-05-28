@@ -28,7 +28,7 @@ class UnpackUtils
 			wps.sample_index = wps.wphdr.block_index;
 		
 		wps.mute_error = 0;
-		wps.crc = -1;
+		wps.crc = wps.crc_x = -1;
 		wps.wvbits.sr = 0;
 		
 		while (MetadataUtils.read_metadata_buff(wpc, wpmd) == Defines.TRUE)
@@ -66,14 +66,17 @@ class UnpackUtils
 	internal static int init_wv_bitstream(WavpackContext wpc, WavpackMetadata wpmd)
 	{
 		WavpackStream wps = wpc.stream;
-		
-		if (wpmd.hasdata)
-			wps.wvbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
-		else if (wpmd.byte_length > 0)
+
+		if (!wpmd.copy_data())
+			return Defines.FALSE;
+
+		//if (wpmd.hasdata)
+		wps.wvbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
+		/*else if (wpmd.byte_length > 0)
 		{
 			int len = wpmd.byte_length & 1;
 			wps.wvbits = BitsUtils.bs_open_read(wpc.read_buffer, -1, wpc.read_buffer.Length, wpc.infile, wpmd.byte_length + len, 1);
-		}
+		}*/
 		
 		return Defines.TRUE;
 	}
@@ -86,7 +89,7 @@ class UnpackUtils
 	{
 		WavpackStream wps = wpc.stream;
 
-		if (wpmd.byte_length == 0 || (wpmd.byte_length & 1) > 0)
+		if ((wpmd.byte_length & 1) > 0 || !wpmd.copy_data())
 			return Defines.FALSE;
 
 		wps.wvcbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
@@ -107,7 +110,7 @@ class UnpackUtils
 
 		int counter = 0;
 
-		if (wpmd.byte_length <= 4 || (wpmd.byte_length & 1) > 0)
+		if (wpmd.byte_length <= 4 || (wpmd.byte_length & 1) > 0 || !wpmd.copy_data())
 			return Defines.FALSE;
 
 		var cp = wpmd.data[counter++];
@@ -116,7 +119,7 @@ class UnpackUtils
 		wps.crc_mvx |= wpmd.data[counter++] << 16;
 		wps.crc_mvx |= wpmd.data[counter++] << 24;
 
-		wps.wvxbits = BitsUtils.bs_open_read(wpmd.data, 0, wpmd.byte_length, wpc.infile, 0, 0);
+		wps.wvxbits = BitsUtils.bs_open_read(wpmd.data, counter, wpmd.byte_length, wpc.infile, 0, 0);
 
 		// the new WVX bitstream format starts with one or two new 5-bit fields
 		if (wpmd.id == Defines.ID_WVX_NEW_BITSTREAM)
@@ -648,7 +651,7 @@ class UnpackUtils
 			i = sample_count;
 		}
 		
-		buffer = fixup_samples(wps, buffer, i, bufferStartPos);
+		fixup_samples(wps, buffer, i, bufferStartPos);
 		
 		if ((flags & Defines.FALSE_STEREO) > 0)
 		{
@@ -1233,38 +1236,88 @@ class UnpackUtils
 	// it is clipped and shifted in a single operation. Otherwise, if it's
 	// lossless then the last step is to apply the final shift (if any).
 	
-	internal static int[] fixup_samples(WavpackStream wps, int[] buffer, long sample_count, int bufferStartPos)
+	internal static void fixup_samples(WavpackStream wps, int[] buffer, long sample_count, int bufferStartPos)
 	{
 		long flags = wps.wphdr.flags;
+		bool lossy_flag = (flags & Defines.HYBRID_FLAG) > 0;// && !wps->block2buff;
 		int shift = (int) ((flags & Defines.SHIFT_MASK) >> Defines.SHIFT_LSB);
 		
 		if ((flags & Defines.FLOAT_DATA) > 0)
 		{
-			long sc = 0;
-			
-			if ((flags & Defines.MONO_FLAG) > 0)
-				sc = sample_count;
-			else
-				sc = sample_count * 2;
-			
-			buffer = FloatUtils.float_values(wps, buffer, sc, bufferStartPos);
+			FloatUtils.float_values(wps, buffer, (flags & Defines.MONO_FLAG) > 0 ? sample_count : sample_count * 2, bufferStartPos);
+			return;
 		}
 		
 		if ((flags & Defines.INT32_DATA) > 0)
 		{
+			long count = (flags & Defines.MONO_FLAG) > 0 ? sample_count : sample_count * 2;
 			int sent_bits = wps.int32_sent_bits, zeros = wps.int32_zeros;
 			int ones = wps.int32_ones, dups = wps.int32_dups;
+			uint data, mask = (1U << sent_bits) - 1;
 			int buffer_counter = bufferStartPos;
-			
-			long count;
-			
-			if ((flags & Defines.MONO_FLAG) > 0)
-				count = sample_count;
-			else
-				count = sample_count * 2;
-			
-			if ((flags & Defines.HYBRID_FLAG) == 0 && sent_bits == 0 && (zeros + ones + dups) != 0)
-				while (count > 0)
+
+			if (wps.wvxbits != null)
+			{
+				int max_width = wps.int32_max_width;
+				int crc = wps.crc_x;
+
+				while (count-- > 0)
+				{
+					if (sent_bits > 0)
+					{
+						if (max_width > 0)
+						{
+							int pvalue = buffer[buffer_counter] < 0 ? ~buffer[buffer_counter] : buffer[buffer_counter];
+							int width = WordsUtils.count_bits(pvalue) + sent_bits;
+							int bits_to_read = sent_bits;
+
+							if (width <= max_width || (bits_to_read -= width - max_width) > 0)
+							{
+								data = (uint)BitsUtils.getbits(bits_to_read, wps.wvxbits) & mask;
+								buffer[buffer_counter] = (int)((uint)(buffer[buffer_counter] << bits_to_read) | data) << (sent_bits - bits_to_read);
+							}
+							else
+								buffer[buffer_counter] = buffer[buffer_counter] << sent_bits;
+						}
+						else
+						{
+							data = (uint)(BitsUtils.getbits(sent_bits, wps.wvxbits) & mask);
+							buffer[buffer_counter] = (int)(((uint)buffer[buffer_counter] << sent_bits) | data);
+						}
+					}
+
+					if (zeros != 0)
+						buffer[buffer_counter] <<= zeros;
+					else if (ones != 0)
+						buffer[buffer_counter] = ((buffer[buffer_counter] + 1) << ones) - 1;
+					else if (dups != 0)
+						buffer[buffer_counter] = ((buffer[buffer_counter] + (buffer[buffer_counter] & 1)) << dups) - (buffer[buffer_counter] & 1);
+
+					crc = crc * 9 + (buffer[buffer_counter] & 0xffff) * 3 + ((buffer[buffer_counter] >> 16) & 0xffff);
+
+					buffer_counter++;
+				}
+
+				wps.crc_x = crc;
+			}
+			//if ((flags & Defines.HYBRID_FLAG) == 0 && sent_bits == 0 && (zeros + ones + dups) != 0)
+			else if (sent_bits == 0 && (zeros + ones + dups) != 0)
+			{
+				while (lossy_flag && (flags & Defines.BYTES_STORED) == 3 && shift < 8)
+				{
+					if (zeros > 0)
+						zeros--;
+					else if (ones > 0)
+						ones--;
+					else if (dups > 0)
+						dups--;
+					else
+						break;
+
+					shift++;
+				}
+
+				while (count-- > 0)
 				{
 					if (zeros != 0)
 						buffer[buffer_counter] <<= zeros;
@@ -1272,20 +1325,22 @@ class UnpackUtils
 						buffer[buffer_counter] = ((buffer[buffer_counter] + 1) << ones) - 1;
 					else if (dups != 0)
 						buffer[buffer_counter] = ((buffer[buffer_counter] + (buffer[buffer_counter] & 1)) << dups) - (buffer[buffer_counter] & 1);
-					
+
 					buffer_counter++;
-					count--;
 				}
+			}
 			else
 				shift += zeros + sent_bits + ones + dups;
 		}
-		
-		if ((flags & Defines.HYBRID_FLAG) > 0)
+
+		shift &= 0x1f;
+
+		if (lossy_flag)
 		{
 			int min_value, max_value, min_shifted, max_shifted;
 			int buffer_counter = bufferStartPos;
 			
-			switch ((int) (flags & (long) Defines.BYTES_STORED))
+			switch (flags & Defines.BYTES_STORED)
 			{
 				case 0: 
 					min_shifted = (min_value = - 128 >> shift) << shift;
@@ -1304,15 +1359,15 @@ class UnpackUtils
 				
 				case 3: 
 				default: 
-					min_shifted = (min_value = (int) SupportClass.Identity(0x80000000) >> shift) << shift;
-					max_shifted = (max_value = (int) 0x7FFFFFFF >> shift) << shift;
+					min_shifted = (min_value = (int) (0x80000000 >> shift)) << shift;
+					max_shifted = (max_value = 0x7FFFFFFF >> shift) << shift;
 					break;
 				}
 			
 			if ((flags & Defines.MONO_FLAG) == 0)
 				sample_count *= 2;
 			
-			while (sample_count > 0)
+			while (sample_count-- > 0)
 			{
 				if (buffer[buffer_counter] < min_value)
 					buffer[buffer_counter] = min_shifted;
@@ -1322,7 +1377,6 @@ class UnpackUtils
 					buffer[buffer_counter] <<= shift;
 				
 				buffer_counter++;
-				sample_count--;
 			}
 		}
 		else if (shift != 0)
@@ -1335,8 +1389,6 @@ class UnpackUtils
 			while (sample_count-- > 0)
 				buffer[buffer_counter++] <<= shift;
 		}
-		
-		return buffer;
 	}
 	
 	
@@ -1351,6 +1403,6 @@ class UnpackUtils
 	{
 		WavpackStream wps = wpc.stream;
 
-		return wps.crc != wps.wphdr.crc;
+		return wps.crc != wps.wphdr.crc || wps.wvxbits != null && wps.crc_x != wps.crc_mvx;
 	}
 }

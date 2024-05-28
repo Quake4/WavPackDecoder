@@ -1,4 +1,3 @@
-using System;
 /*
 ** BitsUtils.cs
 **
@@ -14,9 +13,7 @@ class BitsUtils
 	internal static bool getbit(Bitstream bs)
 	{		
 		if (bs.bc > 0)
-		{
 			bs.bc--;
-		}
 		else
 		{
 			bs.ptr++;
@@ -69,12 +66,11 @@ class BitsUtils
 			bs.sr >>= nbits;
 		}
 		
-		return (retval);
+		return retval;
 	}
 	
 	internal static Bitstream bs_open_read(byte[] stream, int buffer_start, int buffer_end, System.IO.BinaryReader file, int file_bytes, int passed)
 	{
-		//   CLEAR (*bs);
 		Bitstream bs = new Bitstream();
 		
 		bs.buf = stream;
@@ -82,20 +78,19 @@ class BitsUtils
 		bs.end = buffer_end;
 		bs.sr = 0;
 		bs.bc = 0;
-		
+
 		if (passed != 0)
 		{
-			bs.ptr = (short) (bs.end - 1);
+			bs.ptr = (short)(bs.end - 1);
 			bs.file_bytes = file_bytes;
 			bs.file = file;
 		}
 		else
 		{
-			/* Strange to set an index to -1, but the very first call to getbit will iterate this */
-			bs.buf_index = -1;
+			bs.buf_index--;
 			bs.ptr = -1;
 		}
-		
+
 		return bs;
 	}
 	

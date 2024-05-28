@@ -27,7 +27,7 @@ class MetadataUtils
 		}
 		catch (System.Exception)
 		{
-			wpmd.status = 1;
+			wpmd.error = true;
 			return Defines.FALSE;
 		}
 		
@@ -45,7 +45,7 @@ class MetadataUtils
 			}
 			catch (System.Exception)
 			{
-				wpmd.status = 1;
+				wpmd.error = true;
 				return Defines.FALSE;
 			}
 			
@@ -57,7 +57,7 @@ class MetadataUtils
 			}
 			catch (System.Exception)
 			{
-				wpmd.status = 1;
+				wpmd.error = true;
 				return Defines.FALSE;
 			}
 			

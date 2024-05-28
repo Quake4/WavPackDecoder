@@ -178,10 +178,8 @@ public class WavPackUtils
 					break;
 				
 				if (wps.wphdr.block_samples == 0 || wps.sample_index == wps.wphdr.block_index)
-				{
-					if ((UnpackUtils.unpack_init(wpc)) == Defines.FALSE)
+					if (UnpackUtils.unpack_init(wpc) == Defines.FALSE)
 						break;
-				}
 			}
 			
 			if (wps.wphdr.block_samples == 0 || (wps.wphdr.flags & Defines.INITIAL_BLOCK) == 0 || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples)
@@ -205,12 +203,9 @@ public class WavPackUtils
 				
 				bcounter = buf_idx; 
 		
-				while (samples_to_unpack > 0) 
-				{ 
-					buffer[bcounter] = 0; 
-					bcounter++; 
-					samples_to_unpack--; 
-				} 
+				while (samples_to_unpack-- > 0) 
+					buffer[bcounter++] = 0; 
+
 				buf_idx = bcounter; 
 				
 				continue;

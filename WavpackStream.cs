@@ -1,4 +1,3 @@
-using System;
 /*
 ** WavpackStream.cs
 **
@@ -28,7 +27,7 @@ class WavpackStream
 	
 	internal int num_terms = 0;
 	internal int mute_error;
-	internal int crc/*, crc_x*/, crc_mvx;
+	internal int crc, crc_x, crc_mvx;
 	internal long sample_index; // was uint32_t in C
 	
 	internal short int32_sent_bits, int32_zeros, int32_ones, int32_dups; // was uchar in C

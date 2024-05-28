@@ -27,7 +27,7 @@ class FloatUtils
 		return Defines.TRUE;
 	}
 	
-	internal static int[] float_values(WavpackStream wps, int[] values, long num_values, int bufferStartPos)
+	internal static void float_values(WavpackStream wps, int[] values, long num_values, int bufferStartPos)
 	{
 		int shift = wps.float_max_exp - wps.float_norm_exp + wps.float_shift;
 		int value_counter = bufferStartPos;
@@ -51,7 +51,5 @@ class FloatUtils
 			
 			value_counter++;
 		}
-		
-		return values;
 	}
 }
