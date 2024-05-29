@@ -12,9 +12,6 @@ namespace WavPack.Decoder
 {
 public class WvDemo
 {
-	internal static int[] temp_buffer;
-	internal static byte[] pcm_buffer;
-
 	public static int Main(string[] args)
 	{
 		long total_unpacked_samples = 0;
@@ -110,7 +107,8 @@ public class WvDemo
 
 				var loop_samples = total_samples / 100 / samples_unpack * samples_unpack;
 
-				temp_buffer = new int[samples_unpack * num_channels];
+				int[] temp_buffer = new int[samples_unpack * num_channels];
+				byte[] pcm_buffer = new byte[samples_unpack * num_channels * block_align];
 
 				while (true)
 				{
@@ -119,10 +117,8 @@ public class WvDemo
 					total_unpacked_samples += samples_unpacked;
 
 					if (samples_unpacked > 0)
-					{
-						format_samples(temp_buffer, samples_unpacked * num_channels, block_align, byteps);
-						fostream.Write(pcm_buffer, 0, (int)samples_unpacked * block_align);
-					}
+						if (!WavPackUtils.WavpackFormatSamples(temp_buffer, samples_unpacked * num_channels, block_align, byteps, pcm_buffer))
+							break;
 
 					if (total_unpacked_samples % loop_samples == 0)
 						System.Console.Out.Write("Process: " + total_unpacked_samples * 100 / total_samples + "%\r");
@@ -162,62 +158,6 @@ public class WvDemo
 		}
 
 		return 0;
-	}
-
-
-	// Reformat samples from longs in processor's native endian mode to
-	// little-endian data with (possibly) less than 4 bytes / sample.
-
-	internal static void format_samples(int[] src, long samcnt, int block_align, int bps)
-	{
-		int temp;
-		int counter = 0;
-		int counter2 = 0;
-
-		var len = samcnt * block_align;
-		if (pcm_buffer == null || pcm_buffer.Length < len)
-			pcm_buffer = new byte[len];
-
-		switch (bps)
-		{
-			case 1:
-				while (samcnt-- > 0)
-					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
-				break;
-
-			case 2:
-				while (samcnt-- > 0)
-				{
-					temp = src[counter2++];
-					pcm_buffer[counter++] = (byte)temp;
-					pcm_buffer[counter++] = (byte)(temp >> 8);
-				}
-
-				break;
-
-			case 3:
-				while (samcnt-- > 0)
-				{
-					temp = src[counter2++];
-					pcm_buffer[counter++] = (byte)temp;
-					pcm_buffer[counter++] = (byte)(temp >> 8);
-					pcm_buffer[counter++] = (byte)(temp >> 16);
-				}
-
-				break;
-
-			case 4:
-				while (samcnt-- > 0)
-				{
-					temp = src[counter2++];
-					pcm_buffer[counter++] = (byte)temp;
-					pcm_buffer[counter++] = (byte)(temp >> 8);
-					pcm_buffer[counter++] = (byte)(temp >> 16);
-					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24); // with sign
-				}
-
-				break;
-		}
 	}
 }
 }

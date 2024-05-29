@@ -242,6 +242,61 @@ public class WavPackUtils
 	}
 
 
+	// Reformat samples from longs in processor's native endian mode to
+	// little-endian data with (possibly) less than 4 bytes / sample.
+
+	public static bool WavpackFormatSamples(int[] src, long samcnt, int block_align, int bps, byte[] pcm_buffer, int offset = 0)
+	{
+		int temp;
+		int counter = offset;
+		int counter2 = 0;
+
+		var len = samcnt * block_align;
+		if (pcm_buffer == null || pcm_buffer.Length < len + offset)
+			return false;
+
+		switch (bps)
+		{
+			case 1:
+				while (samcnt-- > 0)
+					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
+				break;
+
+			case 2:
+				while (samcnt-- > 0)
+				{
+					temp = src[counter2++];
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(temp >> 8);
+				}
+				break;
+
+			case 3:
+				while (samcnt-- > 0)
+				{
+					temp = src[counter2++];
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(temp >> 8);
+					pcm_buffer[counter++] = (byte)(temp >> 16);
+				}
+				break;
+
+			case 4:
+				while (samcnt-- > 0)
+				{
+					temp = src[counter2++];
+					pcm_buffer[counter++] = (byte)temp;
+					pcm_buffer[counter++] = (byte)(temp >> 8);
+					pcm_buffer[counter++] = (byte)(temp >> 16);
+					pcm_buffer[counter++] = (byte)SupportClass.URShift(temp, 24); // with sign
+				}
+				break;
+		}
+
+		return true;
+	}
+
+
 	// Get total number of samples contained in the WavPack file, or -1 if unknown
 
 	public static long WavpackGetNumSamples(WavpackContext wpc)
