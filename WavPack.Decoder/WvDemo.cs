@@ -147,7 +147,8 @@ public class WvDemo
 
 		fistream?.Dispose();
 
-		if ((WavPackUtils.WavpackGetNumSamples(wpc) != -1) && (total_unpacked_samples != WavPackUtils.WavpackGetNumSamples(wpc)))
+		var num_samples = WavPackUtils.WavpackGetNumSamples(wpc);
+		if (num_samples != -1 && total_unpacked_samples != num_samples)
 		{
 			System.Console.Error.WriteLine("Incorrect number of samples");
 			return 1;
