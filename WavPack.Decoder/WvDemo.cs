@@ -108,7 +108,7 @@ public class WvDemo
 				var loop_samples = total_samples / 100 / samples_unpack * samples_unpack;
 
 				int[] temp_buffer = new int[samples_unpack * num_channels];
-				byte[] pcm_buffer = new byte[samples_unpack * num_channels * block_align];
+				byte[] pcm_buffer = new byte[samples_unpack * block_align];
 
 				while (true)
 				{
@@ -117,8 +117,11 @@ public class WvDemo
 					total_unpacked_samples += samples_unpacked;
 
 					if (samples_unpacked > 0)
-						if (!WavPackUtils.WavpackFormatSamples(temp_buffer, samples_unpacked * num_channels, block_align, byteps, pcm_buffer))
+					{
+						if (!WavPackUtils.WavpackFormatSamples(temp_buffer, samples_unpacked * num_channels, byteps, pcm_buffer))
 							break;
+						fostream.Write(pcm_buffer, 0, (int)samples_unpacked * block_align);
+					}
 
 					if (total_unpacked_samples % loop_samples == 0)
 						System.Console.Out.Write("Process: " + total_unpacked_samples * 100 / total_samples + "%\r");

@@ -245,13 +245,13 @@ public class WavPackUtils
 	// Reformat samples from longs in processor's native endian mode to
 	// little-endian data with (possibly) less than 4 bytes / sample.
 
-	public static bool WavpackFormatSamples(int[] src, long samcnt, int block_align, int bps, byte[] pcm_buffer, int offset = 0)
+	public static bool WavpackFormatSamples(int[] src, long samcnt, int bps, byte[] pcm_buffer, int offset = 0)
 	{
 		int temp;
 		int counter = offset;
 		int counter2 = 0;
 
-		var len = samcnt * block_align;
+		var len = samcnt * bps;
 		if (pcm_buffer == null || pcm_buffer.Length < len + offset)
 			return false;
 
