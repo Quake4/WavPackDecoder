@@ -106,12 +106,6 @@
     <Compile Include="RiffChunkHeader.cs" />
     <Compile Include="WaveHeader.cs" />
     <Compile Include="WvDemo.cs" />
-    <Content Include="license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
