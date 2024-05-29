@@ -8,13 +8,16 @@
 ** Distributed under the BSD Software License (see license.txt)
 ***/
 
-class Bitstream
+namespace WavPack
 {
-	internal int end, ptr; // was uchar in c
-	internal uint sr;
-	internal int file_bytes;
-	internal int error, bc;
-	internal System.IO.BinaryReader file;
-	internal byte[] buf = new byte[Defines.BITSTREAM_BUFFER_SIZE];
-	internal int buf_index = 0;
+	class Bitstream
+	{
+		internal int end, ptr; // was uchar in c
+		internal uint sr;
+		internal int file_bytes;
+		internal int error, bc;
+		internal System.IO.BinaryReader file;
+		internal byte[] buf = new byte[Defines.BITSTREAM_BUFFER_SIZE];
+		internal int buf_index = 0;
+	}
 }

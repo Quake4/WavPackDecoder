@@ -9,23 +9,26 @@
 // the architecture of the resulting solution may differ somewhat.
 //
 
-/// <summary>
-/// Contains conversion support elements such as classes, interfaces and static methods.
-/// </summary>
-public class SupportClass
+namespace WavPack
 {
-	/*******************************/
 	/// <summary>
-	/// Performs an unsigned bitwise right shift with the specified number
+	/// Contains conversion support elements such as classes, interfaces and static methods.
 	/// </summary>
-	/// <param name="number">Number to operate on</param>
-	/// <param name="bits">Ammount of bits to shift</param>
-	/// <returns>The resulting number from the shift operation</returns>
-	public static int URShift(int number, int bits)
+	public class SupportClass
 	{
-		if ( number >= 0)
-			return number >> bits;
-		else
-			return (number >> bits) + (2 << ~bits);
+		/*******************************/
+		/// <summary>
+		/// Performs an unsigned bitwise right shift with the specified number
+		/// </summary>
+		/// <param name="number">Number to operate on</param>
+		/// <param name="bits">Ammount of bits to shift</param>
+		/// <returns>The resulting number from the shift operation</returns>
+		public static int URShift(int number, int bits)
+		{
+			if (number >= 0)
+				return number >> bits;
+			else
+				return (number >> bits) + (2 << ~bits);
+		}
 	}
 }

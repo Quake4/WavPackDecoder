@@ -8,12 +8,15 @@
 ** Distributed under the BSD Software License (see license.txt)  
 ***/
 
-class WavpackHeader
+namespace WavPack
 {
-	internal uint ckSize;
-	internal short version;
-	internal byte track_no, index_no;
-	internal uint total_samples, block_index, block_samples, flags;
-	internal int crc;
-	internal bool error; // means error
+	class WavpackHeader
+	{
+		internal uint ckSize;
+		internal short version;
+		internal byte track_no, index_no;
+		internal uint total_samples, block_index, block_samples, flags;
+		internal int crc;
+		internal bool error; // means error
+	}
 }

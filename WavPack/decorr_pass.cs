@@ -1,4 +1,3 @@
-using System;
 /*
 ** decorr_pass.cs
 **
@@ -9,18 +8,21 @@ using System;
 ** Distributed under the BSD Software License (see license.txt)  
 ***/
 
-class decorr_pass
+namespace WavPack
 {
-	public decorr_pass()
+	class decorr_pass
 	{
-		InitBlock();
+		public decorr_pass()
+		{
+			InitBlock();
+		}
+		private void InitBlock()
+		{
+			samples_A = new int[Defines.MAX_TERM];
+			samples_B = new int[Defines.MAX_TERM];
+		}
+		internal short term, delta, weight_A, weight_B;
+		internal int[] samples_A;
+		internal int[] samples_B;
 	}
-	private void  InitBlock()
-	{
-		samples_A = new int[Defines.MAX_TERM];
-		samples_B = new int[Defines.MAX_TERM];
-	}
-	internal short term, delta, weight_A, weight_B;
-	internal int[] samples_A;
-	internal int[] samples_B;
 }
