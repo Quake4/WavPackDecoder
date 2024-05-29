@@ -18,5 +18,7 @@ class WavpackHeader
 	internal uint total_samples, block_index, block_samples, flags;
 	internal int crc;
 	internal bool error; // means error
+	internal long stream_position;
+	internal long average_block_size;
 }
 }

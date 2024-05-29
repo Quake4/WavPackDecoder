@@ -324,9 +324,9 @@ public class WavPackUtils
 
 	// return if any uncorrected lossy blocks were actually written or read
 
-	public static bool WavpackLossyBlocks(WavpackContext wpc)
+	public static bool WavpackLossy(WavpackContext wpc)
 	{
-		return wpc.lossy_blocks;
+		return wpc.lossy_blocks || (wpc.config.flags & Defines.CONFIG_HYBRID_FLAG) != 0;
 	}
 
 
@@ -457,21 +457,14 @@ public class WavPackUtils
 
 	// The following seek functionality has not yet been extensively tested
 
-	public static void setTime(WavpackContext wpc, long milliseconds)
+	public static bool SetTime(WavpackContext wpc, long milliseconds)
 	{
-		long targetSample = (long)(milliseconds / 1000 * wpc.config.sample_rate);
-		try
-		{
-			seek(wpc, wpc.infile, wpc.infile.BaseStream.Position, targetSample);
-		}
-		catch (System.IO.IOException)
-		{
-		}
+		return seek(wpc, wpc.infile, milliseconds / 1000 * wpc.config.sample_rate);
 	}
 
-	public static void setSample(WavpackContext wpc, long sample)
+	public static bool SetSample(WavpackContext wpc, long sample)
 	{
-		seek(wpc, wpc.infile, 0, sample);
+		return seek(wpc, wpc.infile, sample);
 	}
 
 	// Find the WavPack block that contains the specified sample. If "header_pos"
@@ -481,91 +474,144 @@ public class WavPackUtils
 	// the first stream and we can limit our search to either the portion above
 	// or below that point. If a .wvc file is being used, then this must be called
 	// for that file also.
-	private static void seek(WavpackContext wpc, System.IO.BinaryReader infile, long headerPos, long targetSample)
+	private static bool seek(WavpackContext wpc, System.IO.BinaryReader infile, long targetSample)
 	{
 		try
 		{
 			WavpackStream wps = wpc.stream;
-			long file_pos1 = 0;
-			long file_pos2 = wpc.infile.BaseStream.Length;
-			long sample_pos1 = 0, sample_pos2 = wpc.total_samples;
-			double ratio = 0.96;
-			int file_skip = 0;
+			// new positioning
 			if (targetSample >= wpc.total_samples)
-				return;
-			if (headerPos > 0 && wps.wphdr.block_samples > 0)
-			{
-				if (wps.wphdr.block_index > targetSample)
-				{
-					sample_pos2 = wps.wphdr.block_index;
-					file_pos2 = headerPos;
-				}
-				else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
-				{
-					sample_pos1 = wps.wphdr.block_index;
-					file_pos1 = headerPos;
-				}
-				else
-					return;
-			}
-			while (true)
-			{
-				double bytes_per_sample;
-				long seek_pos;
-				bytes_per_sample = file_pos2 - file_pos1;
-				bytes_per_sample /= sample_pos2 - sample_pos1;
-				seek_pos = file_pos1 + (file_skip > 0 ? 32 : 0);
-				seek_pos += (long)(bytes_per_sample * (targetSample - sample_pos1) * ratio);
-				infile.BaseStream.Seek(seek_pos, 0);
+				return false;
+			if (targetSample < 0)
+					targetSample = 0;
 
-				long temppos = infile.BaseStream.Position;
-				wps.wphdr = read_next_header(infile, wps.wphdr);
+				var count = 100;
 
-				if (wps.wphdr.error || seek_pos >= file_pos2)
+				while (count-- > 0)
 				{
-					if (ratio > 0.0)
+					var seek_pos = wps.wphdr.stream_position;
+
+					if (targetSample <= wps.wphdr.block_samples)
+						seek_pos = 0;
+					else if (targetSample < wps.wphdr.block_index || targetSample > wps.wphdr.block_index + wps.wphdr.block_samples)
 					{
-						if ((ratio -= 0.24) < 0.0)
-							ratio = 0.0;
+						// try find pos
+						var distance = targetSample - wps.wphdr.block_index;
+						// align to block
+						distance += distance > 0 ? (wps.wphdr.block_samples - 1) : (-2 * wps.wphdr.block_samples + 1);
+						var blocks = distance / wps.wphdr.block_samples;
+						// if last three just read faster
+						if (blocks > 0 && blocks <= 3)
+							seek_pos = -1;
+						else
+							seek_pos += blocks * wps.wphdr.average_block_size;
+					}
+
+					if (seek_pos != -1)
+						infile.BaseStream.Seek(seek_pos, 0);
+
+					wps.wphdr = read_next_header(infile, wps.wphdr);
+
+					// if into a block
+					if (targetSample >= wps.wphdr.block_index && targetSample < (wps.wphdr.block_index + wps.wphdr.block_samples))
+					{
+						long index = targetSample - wps.wphdr.block_index;
+						//infile.BaseStream.Seek(seek_pos, 0);
+						//WavpackContext c = WavpackOpenFileInput(infile);
+						//wpc.stream = c.stream;
+						int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
+						while (index > 0)
+						{
+							long toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
+							toUnpack = WavpackUnpackSamples(wpc, temp_buf, toUnpack);
+							index -= toUnpack;
+						}
+						return true;
+					}
+				}
+
+				/*
+				long file_pos1 = 0;
+				long file_pos2 = wpc.infile.BaseStream.Length;
+				long sample_pos1 = 0, sample_pos2 = wpc.total_samples;
+				double ratio = 0.96;
+				int file_skip = 0;
+				if (targetSample >= wpc.total_samples)
+					return;
+				if (headerPos > 0 && wps.wphdr.block_samples > 0)
+				{
+					if (wps.wphdr.block_index > targetSample)
+					{
+						sample_pos2 = wps.wphdr.block_index;
+						file_pos2 = headerPos;
+					}
+					else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
+					{
+						sample_pos1 = wps.wphdr.block_index;
+						file_pos1 = headerPos;
 					}
 					else
 						return;
 				}
-				else if (wps.wphdr.block_index > targetSample)
+				while (true)
 				{
-					sample_pos2 = wps.wphdr.block_index;
-					file_pos2 = seek_pos;
-				}
-				else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
-				{
-					if (seek_pos == file_pos1)
-						file_skip = 1;
+					double bytes_per_sample;
+					long seek_pos;
+					bytes_per_sample = file_pos2 - file_pos1;
+					bytes_per_sample /= sample_pos2 - sample_pos1;
+					seek_pos = file_pos1 + (file_skip > 0 ? 32 : 0);
+					seek_pos += (long)(bytes_per_sample * (targetSample - sample_pos1) * ratio);
+					infile.BaseStream.Seek(seek_pos, 0);
+
+					long temppos = infile.BaseStream.Position;
+					wps.wphdr = read_next_header(infile, wps.wphdr);
+
+					if (wps.wphdr.error || seek_pos >= file_pos2)
+					{
+						if (ratio > 0.0)
+						{
+							if ((ratio -= 0.24) < 0.0)
+								ratio = 0.0;
+						}
+						else
+							return;
+					}
+					else if (wps.wphdr.block_index > targetSample)
+					{
+						sample_pos2 = wps.wphdr.block_index;
+						file_pos2 = seek_pos;
+					}
+					else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
+					{
+						if (seek_pos == file_pos1)
+							file_skip = 1;
+						else
+						{
+							sample_pos1 = wps.wphdr.block_index;
+							file_pos1 = seek_pos;
+						}
+					}
 					else
 					{
-						sample_pos1 = wps.wphdr.block_index;
-						file_pos1 = seek_pos;
+						int index = (int)(targetSample - wps.wphdr.block_index);
+						infile.BaseStream.Seek(seek_pos, 0);
+						WavpackContext c = WavpackOpenFileInput(infile);
+						wpc.stream = c.stream;
+						int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
+						while (index > 0)
+						{
+							int toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
+							WavpackUnpackSamples(wpc, temp_buf, toUnpack);
+							index = index - toUnpack;
+						}
+						return;
 					}
-				}
-				else
-				{
-					int index = (int)(targetSample - wps.wphdr.block_index);
-					infile.BaseStream.Seek(seek_pos, 0);
-					WavpackContext c = WavpackOpenFileInput(infile);
-					wpc.stream = c.stream;
-					int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
-					while (index > 0)
-					{
-						int toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
-						WavpackUnpackSamples(wpc, temp_buf, toUnpack);
-						index = index - toUnpack;
-					}
-					return;
-				}
+				}*/
 			}
-		}
 		catch (System.IO.IOException)
 		{
 		}
+		return false;
 	}
 
 	// Read from current file position until a valid 32-byte WavPack 4.0 header is
@@ -625,6 +671,11 @@ public class WavPackUtils
 				wphdr.crc = (buffer[31] << 24) | (buffer[30] << 16) | (buffer[29] << 8) | buffer[28];
 
 				wphdr.error = false;
+				wphdr.stream_position = infile.BaseStream.Position - bleft; // start pos of header
+				if (wphdr.average_block_size == 0)
+					wphdr.average_block_size = wphdr.ckSize;
+				else
+					wphdr.average_block_size = (wphdr.average_block_size + wphdr.ckSize) / 2;
 
 				return wphdr;
 			}

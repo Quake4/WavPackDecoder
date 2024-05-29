@@ -51,7 +51,7 @@ public class WvDemo
 		int block_align = byteps * num_channels;
 		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
-		var lossy = WavPackUtils.WavpackLossyBlocks(wpc);
+		var lossy = WavPackUtils.WavpackLossy(wpc);
 		var version = WavPackUtils.WavpackGetVersion(wpc);
 
 		System.Console.Out.WriteLine("The WavPack " + (WavPackUtils.WavpackGetIsFive(wpc) ? "5" : "4") +
