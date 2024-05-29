@@ -10,27 +10,27 @@
 
 namespace WavPack
 {
-	public class WavpackContext
-	{
-		internal WavpackConfig config = new WavpackConfig();
-		internal WavpackStream stream = new WavpackStream();
+public class WavpackContext
+{
+	internal WavpackConfig config = new WavpackConfig();
+	internal WavpackStream stream = new WavpackStream();
 
-		internal byte[] read_buffer = new byte[Defines.BITSTREAM_BUFFER_SIZE];
-		internal string error_message;
+	internal byte[] read_buffer = new byte[Defines.BITSTREAM_BUFFER_SIZE];
+	internal string error_message;
 
-		internal System.IO.BinaryReader infile;
-		internal long total_samples, crc_errors; // was uint32_t in C
-		internal int open_flags, norm_offset;
-		internal int reduced_channels = 0;
-		internal bool lossy_blocks;
-		internal int status = 0; // 0 ok, 1 error
+	internal System.IO.BinaryReader infile;
+	internal long total_samples, crc_errors; // was uint32_t in C
+	internal int open_flags, norm_offset;
+	internal int reduced_channels = 0;
+	internal bool lossy_blocks;
+	internal int status = 0; // 0 ok, 1 error
 
-		internal bool five = false;
+	internal bool five = false;
 
-		// optional = new
-		internal eFileFormat file_format = eFileFormat.WAV;
-		internal string file_extension = null;
-		internal byte[] header;
-		internal byte[] trailer;
-	}
+	// optional = new
+	internal eFileFormat file_format = eFileFormat.WAV;
+	internal string file_extension = null;
+	internal byte[] header;
+	internal byte[] trailer;
+}
 }
