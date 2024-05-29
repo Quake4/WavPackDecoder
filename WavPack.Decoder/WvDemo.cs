@@ -39,9 +39,10 @@ public class WvDemo
 			return 1;
 		}
 
-		if (!string.IsNullOrEmpty(wpc.error_message))
+		var error = WavPackUtils.WavpackGetErrorMessage(wpc);
+		if (!string.IsNullOrEmpty(error))
 		{
-			System.Console.Error.WriteLine("Error: " + wpc.error_message);
+			System.Console.Error.WriteLine("Error: " + error);
 			return 1;
 		}
 
@@ -52,12 +53,12 @@ public class WvDemo
 		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 		var lossy = WavPackUtils.WavpackLossyBlocks(wpc);
+		var version = WavPackUtils.WavpackGetVersion(wpc);
 
-		var version = wpc.stream.wphdr.version;
-
-		System.Console.Out.WriteLine("The WavPack " + (wpc.five ? "5" : "4") + " (" + (version >> 8) + "." + (version & 0xFF) + ")" +
+		System.Console.Out.WriteLine("The WavPack " + (WavPackUtils.WavpackGetIsFive(wpc) ? "5" : "4") +
+			" (" + (version >> 8) + "." + (version & 0xFF) + ")" +
 			" file '" + System.IO.Path.GetFileName(inputWVFile) + "' has:");
-		System.Console.Out.WriteLine(wpc.file_format + " format");
+		System.Console.Out.WriteLine(WavPackUtils.WavpackGetFileFormat(wpc) + " format");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
@@ -67,8 +68,10 @@ public class WvDemo
 		{
 			using (var fostream = new System.IO.FileStream(System.IO.Path.ChangeExtension(inputWVFile, WavPackUtils.WavpackGetFileExtension(wpc)), System.IO.FileMode.Create))
 			{
-				if (wpc.header != null && (wpc.config.flags & Defines.CONFIG_FLOAT_DATA) == 0)
-					fostream.Write(wpc.header, 0, wpc.header.Length);
+				var header = WavPackUtils.WavpackGetHeader(wpc);
+
+				if (header != null && !WavPackUtils.WavpackGetIsFloat(wpc))
+					fostream.Write(header, 0, header.Length);
 				else
 				{
 					var riffChunkHeader = new RiffChunkHeader((uint)(total_samples * block_align + 2 * ChunkHeader.Size + WaveHeader.Size));
@@ -128,8 +131,9 @@ public class WvDemo
 
 				System.Console.Out.WriteLine(sw.ElapsedMilliseconds + " milliseconds to process WavPack file in main loop");
 
-				if (wpc.trailer != null)
-					fostream.Write(wpc.trailer, 0, wpc.trailer.Length);
+				var trailer = WavPackUtils.WavpackGetTrailer(wpc);
+				if (trailer != null)
+					fostream.Write(trailer, 0, trailer.Length);
 			}
 		}
 		catch (System.Exception e)

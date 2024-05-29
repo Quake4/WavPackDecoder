@@ -7,13 +7,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>WavPackDecoder</AssemblyName>
+    <AssemblyName>WavPack</AssemblyName>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>false</DelaySign>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>WavPackDecoder</RootNamespace>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WavPack</RootNamespace>
     <NoStandardLibraries>false</NoStandardLibraries>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <FileUpgradeFlags>
@@ -22,7 +22,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ProjectGuid>{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}</ProjectGuid>
+    <ProjectGuid>{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}</ProjectGuid>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetZone>LocalIntranet</TargetZone>
     <ProductVersion>9.0.21022</ProductVersion>
@@ -43,7 +43,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>.</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -60,7 +60,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>.</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -73,6 +73,9 @@
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <Optimize>True</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
@@ -104,16 +107,13 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Bitstream.cs" />
     <Compile Include="BitsUtils.cs" />
-    <Compile Include="ChunkHeader.cs" />
     <Compile Include="decorr_pass.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="entropy_data.cs" />
     <Compile Include="FloatUtils.cs" />
     <Compile Include="MetadataUtils.cs" />
-    <Compile Include="RiffChunkHeader.cs" />
     <Compile Include="SupportClass.cs" />
     <Compile Include="UnpackUtils.cs" />
-    <Compile Include="WaveHeader.cs" />
     <Compile Include="WavpackConfig.cs" />
     <Compile Include="WavpackContext.cs" />
     <Compile Include="WavpackHeader.cs" />
@@ -122,9 +122,6 @@
     <Compile Include="WavPackUtils.cs" />
     <Compile Include="WordsUtils.cs" />
     <Compile Include="words_data.cs" />
-    <Compile Include="WvDemo.cs" />
-    <Content Include="license.txt" />
-    <Content Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

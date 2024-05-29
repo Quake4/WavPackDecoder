@@ -13,7 +13,7 @@ public class Defines
 	// Change the following value to an even number to reflect the maximum number of samples to be processed
 	// per call to WavPackUtils.WavpackUnpackSamples
 
-	internal const int SAMPLE_BUFFER_SIZE = 4096;//256;
+	public const int SAMPLE_BUFFER_SIZE = 4096;
 	
 	internal const int BITSTREAM_BUFFER_SIZE = 16 * 1024;
 	

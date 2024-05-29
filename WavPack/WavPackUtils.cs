@@ -111,19 +111,19 @@ public class WavPackUtils
 
 		return wpc;
 	}
-	
+
 	// This function obtains general information about an open file and returns
 	// a mask with the following bit values:
-	
+
 	// MODE_LOSSLESS:  file is lossless (pure lossless only)
 	// MODE_HYBRID:  file is hybrid mode (lossy part only)
 	// MODE_FLOAT:  audio data is 32-bit ieee floating point (but will provided
 	//               in 24-bit integers for convenience)
 	// MODE_HIGH:  file was created in "high" mode (information only)
 	// MODE_FAST:  file was created in "fast" mode (information only)
-	
-	
-	internal static int WavpackGetMode(WavpackContext wpc)
+
+
+	public static int WavpackGetMode(WavpackContext wpc)
 	{
 		int mode = 0;
 		
@@ -146,8 +146,8 @@ public class WavPackUtils
 		
 		return mode;
 	}
-	
-	
+
+
 	// Unpack the specified number of samples from the current file position.
 	// Note that "samples" here refers to "complete" samples, which would be
 	// 2 longs for stereo files. The audio data is returned right-justified in
@@ -157,8 +157,8 @@ public class WavPackUtils
 	// also be clipped). The actual number of samples unpacked is returned,
 	// which should be equal to the number requested unless the end of fle is
 	// encountered or an error occurs.
-	
-	internal static long WavpackUnpackSamples(WavpackContext wpc, int[] buffer, long samples)
+
+	public static long WavpackUnpackSamples(WavpackContext wpc, int[] buffer, long samples)
 	{
 		WavpackStream wps = wpc.stream;
 		long samples_unpacked = 0, samples_to_unpack;
@@ -238,65 +238,65 @@ public class WavPackUtils
 		
 		return samples_unpacked;
 	}
-	
-	
+
+
 	// Get total number of samples contained in the WavPack file, or -1 if unknown
-	
-	internal static long WavpackGetNumSamples(WavpackContext wpc)
+
+	public static long WavpackGetNumSamples(WavpackContext wpc)
 	{
 		// -1 would mean an unknown number of samples
 		return wpc.total_samples;
 	}
-	
-	
+
+
 	// Get the current sample index position, or -1 if unknown
-	
-	internal static long WavpackGetSampleIndex(WavpackContext wpc)
+
+	public static long WavpackGetSampleIndex(WavpackContext wpc)
 	{
 		return wpc.stream.sample_index;
 	}
-	
-	
+
+
 	// Get the number of errors encountered so far
-	
-	internal static long WavpackGetNumErrors(WavpackContext wpc)
+
+	public static long WavpackGetNumErrors(WavpackContext wpc)
 	{
 		return wpc.crc_errors;
 	}
-	
-	
+
+
 	// return if any uncorrected lossy blocks were actually written or read
-	
-	internal static bool WavpackLossyBlocks(WavpackContext wpc)
+
+	public static bool WavpackLossyBlocks(WavpackContext wpc)
 	{
 		return wpc.lossy_blocks;
 	}
-	
-	
+
+
 	// Returns the sample rate of the specified WavPack file
-	
-	internal static long WavpackGetSampleRate(WavpackContext wpc)
+
+	public static long WavpackGetSampleRate(WavpackContext wpc)
 	{
 		if (wpc.config.sample_rate != 0)
 			return wpc.config.sample_rate;
 		else
 			return 44100;
 	}
-	
-	
+
+
 	// Returns the number of channels of the specified WavPack file. Note that
 	// this is the actual number of channels contained in the file, but this
 	// version can only decode the first two.
-	
-	internal static int WavpackGetNumChannels(WavpackContext wpc)
+
+	public static int WavpackGetNumChannels(WavpackContext wpc)
 	{
 		if (wpc.config.num_channels != 0)
 			return wpc.config.num_channels;
 		else
 			return 2;
 	}
-	
-	
+
+
 	// Returns the actual number of valid bits per sample contained in the
 	// original file, which may or may not be a multiple of 8. Floating data
 	// always has 32 bits, integers may be from 1 to 32 bits each. When this
@@ -304,36 +304,36 @@ public class WavPackUtils
 	// LSBs of the results. That is, values are right justified when unpacked
 	// into longs, but are left justified in the number of bytes used by the
 	// original data.
-	
-	internal static int WavpackGetBitsPerSample(WavpackContext wpc)
+
+	public static int WavpackGetBitsPerSample(WavpackContext wpc)
 	{
 		if (wpc.config.bits_per_sample != 0)
 			return wpc.config.bits_per_sample;
 		else
 			return 16;
 	}
-	
-	
+
+
 	// Returns the number of bytes used for each sample (1 to 4) in the original
 	// file. This is required information for the user of this module because the
 	// audio data is returned in the LOWER bytes of the long buffer and must be
 	// left-shifted 8, 16, or 24 bits if normalized longs are required.
-	
-	internal static int WavpackGetBytesPerSample(WavpackContext wpc)
+
+	public static int WavpackGetBytesPerSample(WavpackContext wpc)
 	{
 		if (wpc.config.bytes_per_sample != 0)
 			return wpc.config.bytes_per_sample;
 		else
 			return 2;
 	}
-	
-	
+
+
 	// This function will return the actual number of channels decoded from the
 	// file (which may or may not be less than the actual number of channels, but
 	// will always be 1 or 2). Normally, this will be the front left and right
 	// channels of a multi-channel file.
-	
-	internal static int WavpackGetReducedChannels(WavpackContext wpc)
+
+	public static int WavpackGetReducedChannels(WavpackContext wpc)
 	{
 		if (wpc.reduced_channels != 0)
 			return wpc.reduced_channels;
@@ -365,6 +365,36 @@ public class WavPackUtils
 			return wpc.file_extension;
 		else
 			return "wav";
+	}
+
+	public static string WavpackGetErrorMessage(WavpackContext wpc)
+	{
+		return wpc.error_message;
+	}
+
+	public static byte[] WavpackGetHeader(WavpackContext wpc)
+	{
+		return wpc.header;
+	}
+
+	public static byte[] WavpackGetTrailer(WavpackContext wpc)
+	{
+		return wpc.trailer;
+	}
+
+	public static bool WavpackGetIsFive(WavpackContext wpc)
+	{
+		return wpc.five;
+	}
+
+	public static short WavpackGetVersion(WavpackContext wpc)
+	{
+		return wpc.stream.wphdr.version;
+	}
+
+	public static bool WavpackGetIsFloat(WavpackContext wpc)
+	{
+		return (wpc.config.flags & Defines.CONFIG_FLOAT_DATA) > 0;
 	}
 
 

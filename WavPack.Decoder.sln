@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavPackDecoder", "WavPackDecoder\WavPackDecoder.csproj", "{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavPack.Decoder", "WavPack.Decoder\WavPack.Decoder.csproj", "{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavPack", "WavPack\WavPack.csproj", "{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66209B1A-1F7D-46E8-B286-EB90AD631C58}
 	EndGlobalSection
 EndGlobal
