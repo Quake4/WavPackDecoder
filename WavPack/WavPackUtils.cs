@@ -625,11 +625,10 @@ public class WavPackUtils
 		long bytes_skipped = 0;
 		int bleft = 0; // bytes left in buffer
 		int counter = 0;
-		int i = 0;
 
 		while (true)
 		{
-			for (i = 0; i < bleft; i++)
+			for (var i = 0; i < bleft; i++)
 				buffer[i] = buffer[32 - bleft + i];
 
 			counter = 0;
@@ -684,7 +683,7 @@ public class WavPackUtils
 				bleft--;
 			}
 
-			bytes_skipped = bytes_skipped + counter;
+			bytes_skipped += counter;
 
 			if (bytes_skipped > 1048576L)
 			{
