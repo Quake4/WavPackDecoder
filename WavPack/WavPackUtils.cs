@@ -153,23 +153,29 @@ public class WavPackUtils
 			mode |= Defines.MODE_FAST;
 
 		if ((wpc.config.flags & Defines.CONFIG_EXTRA_MODE) != 0)
-			mode |= (Defines.MODE_EXTRA | (wpc.config.xmode << 12));
+			mode |= Defines.MODE_EXTRA | ((wpc.config.xmode << 12) & Defines.MODE_XMODE);
 
 		return mode;
 	}
 
 	public static string WavpackGetCompressionLevel(WavpackContext wpc)
 	{
+		string result = null;
 		var mode = WavpackGetMode(wpc);
 		if ((mode & Defines.MODE_FAST) > 0)
-			return "Fast";
+			result += "Fast";
 		else if ((mode & Defines.MODE_VERY_HIGH) > 0)
-			return "Very High";
+			result += "Very High";
 		else if ((mode & Defines.MODE_HIGH) > 0)
-			return "High";
+			result += "High";
 		if ((mode & Defines.MODE_EXTRA) > 0)
-			return "Extra";
-		return null;
+		{
+			if (result == null) result += "Default";
+			if (result != null) result += ", ";
+			var m = (mode & Defines.MODE_XMODE) >> 12;
+			result += "Extra-" + m;
+		}
+		return result;
 	}
 
 

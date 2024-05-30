@@ -139,6 +139,7 @@ public class Defines
 	internal const int MODE_FAST = 0x40;
 	internal const int MODE_EXTRA = 0x80;
 	internal const int MODE_VERY_HIGH = 0x400;
+	internal const int MODE_XMODE = 0x7000;  // mask for extra level (1-6, 0=unknown)
 }
 
 public enum eFileFormat
