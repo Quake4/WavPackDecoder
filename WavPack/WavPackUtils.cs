@@ -141,12 +141,35 @@ public class WavPackUtils
 			mode |= Defines.MODE_FLOAT;
 
 		if ((wpc.config.flags & Defines.CONFIG_HIGH_FLAG) != 0)
+		{
 			mode |= Defines.MODE_HIGH;
+
+			if ((wpc.config.flags & Defines.CONFIG_VERY_HIGH_FLAG) > 0 ||
+				(wpc.stream.wphdr.version < 0x405))
+					mode |= Defines.MODE_VERY_HIGH;
+		}
 
 		if ((wpc.config.flags & Defines.CONFIG_FAST_FLAG) != 0)
 			mode |= Defines.MODE_FAST;
 
+		if ((wpc.config.flags & Defines.CONFIG_EXTRA_MODE) != 0)
+			mode |= (Defines.MODE_EXTRA | (wpc.config.xmode << 12));
+
 		return mode;
+	}
+
+	public static string WavpackGetCompressionLevel(WavpackContext wpc)
+	{
+		var mode = WavpackGetMode(wpc);
+		if ((mode & Defines.MODE_FAST) > 0)
+			return "Fast";
+		else if ((mode & Defines.MODE_VERY_HIGH) > 0)
+			return "Very High";
+		else if ((mode & Defines.MODE_HIGH) > 0)
+			return "High";
+		if ((mode & Defines.MODE_EXTRA) > 0)
+			return "Extra";
+		return null;
 	}
 
 

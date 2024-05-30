@@ -137,15 +137,17 @@ public class Defines
 	internal const int MODE_VALID_TAG = 0x10;
 	internal const int MODE_HIGH = 0x20;
 	internal const int MODE_FAST = 0x40;
+	internal const int MODE_EXTRA = 0x80;
+	internal const int MODE_VERY_HIGH = 0x400;
 }
 
 public enum eFileFormat
 {
-	WAV = 0,       // Microsoft RIFF, including BWF and RF64 variants
-	W64 = 1,       // Sony Wave64
-	CAF = 2,       // Apple CoreAudio
-	DFF = 3,       // Philips DSDIFF
-	DSF = 4,       // Sony DSD Format
-	AIF = 5,       // Apple AIFF
+	WAV = 0, // Microsoft RIFF, including BWF and RF64 variants
+	W64 = 1, // Sony Wave64
+	CAF = 2, // Apple CoreAudio
+	DFF = 3, // Philips DSDIFF
+	DSF = 4, // Sony DSD Format
+	AIF = 5, // Apple AIFF
 }
 }

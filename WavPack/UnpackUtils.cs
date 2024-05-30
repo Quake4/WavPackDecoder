@@ -443,6 +443,11 @@ class UnpackUtils
 			wpc.config.flags |= (long)(byteptr[counter++] << 24);
 		}
 
+		if (bytecnt >= 4 && (wpc.config.flags & Defines.CONFIG_EXTRA_MODE) > 0) {
+			wpc.config.xmode = byteptr[counter++];
+			bytecnt--;
+		}
+
 		if (bytecnt >= 5)
 			wpc.five = true;
 

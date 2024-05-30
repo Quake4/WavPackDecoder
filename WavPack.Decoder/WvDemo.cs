@@ -53,6 +53,7 @@ public class WvDemo
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 		var lossy = WavPackUtils.WavpackLossy(wpc);
 		var version = WavPackUtils.WavpackGetVersion(wpc);
+		var compressionLevel = WavPackUtils.WavpackGetCompressionLevel(wpc);
 
 		System.Console.Out.WriteLine("The WavPack " + (WavPackUtils.WavpackGetIsFive(wpc) ? "5" : "4") +
 			" (" + (version >> 8) + "." + (version & 0xFF) + ")" +
@@ -62,6 +63,8 @@ public class WvDemo
 		System.Console.Out.WriteLine(bits + " bits per sample");
 		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
 		System.Console.Out.WriteLine((lossy ? "Lossy" : "Losseless") + " decoding");
+		if (compressionLevel != null)
+			System.Console.Out.WriteLine(compressionLevel + " compression level");
 
 		try
 		{
