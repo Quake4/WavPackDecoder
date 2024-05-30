@@ -479,15 +479,16 @@ public class WavPackUtils
 		try
 		{
 			WavpackStream wps = wpc.stream;
-			/*// new positioning
+			// new positioning
 			if (targetSample >= wpc.total_samples)
 				return false;
 			if (targetSample < 0)
 					targetSample = 0;
 
-				var count = 100;
+				var steps = 20;
+				const int min = 5;
 
-				while (count-- > 0)
+				while (steps-- > 0)
 				{
 					var seek_pos = wps.wphdr.stream_position;
 
@@ -497,11 +498,11 @@ public class WavPackUtils
 					{
 						// try find pos
 						var distance = targetSample - wps.wphdr.block_index;
-						// align to block
-						distance += distance > 0 ? (wps.wphdr.block_samples - 1) : (-2 * wps.wphdr.block_samples + 1);
+						// align to block, for back with 3 blocks gap for faster search
+						distance += distance > 0 ? (wps.wphdr.block_samples - 1) : (-3 * wps.wphdr.block_samples + 1);
 						var blocks = distance / wps.wphdr.block_samples;
-						// if last three just read faster
-						if (blocks > 0 && blocks <= 3)
+						// if distance too close just read headers is faster
+						if (blocks > 0 && blocks <= min)
 							seek_pos = -1;
 						else
 							seek_pos += blocks * wps.wphdr.average_block_size;
@@ -512,13 +513,16 @@ public class WavPackUtils
 
 					wps.wphdr = read_next_header(infile, wps.wphdr);
 
+					if (wps.wphdr.error)
+						return false;
+
 					// if into a block
 					if (targetSample >= wps.wphdr.block_index && targetSample < (wps.wphdr.block_index + wps.wphdr.block_samples))
 					{
 						long index = targetSample - wps.wphdr.block_index;
-						//infile.BaseStream.Seek(seek_pos, 0);
-						//WavpackContext c = WavpackOpenFileInput(infile);
-						//wpc.stream = c.stream;
+						infile.BaseStream.Seek(wps.wphdr.stream_position, 0);
+						WavpackContext c = WavpackOpenFileInput(infile);
+						wpc.stream = c.stream;
 						int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
 						while (index > 0)
 						{
@@ -528,9 +532,12 @@ public class WavPackUtils
 						}
 						return true;
 					}
+
+					if (seek_pos == -1)
+						infile.BaseStream.Seek(wps.wphdr.stream_position + wps.wphdr.ckSize, 0);
 				}
-				*/
-				
+
+				/*
 				long file_pos1 = 0;
 				long file_pos2 = wpc.infile.BaseStream.Length;
 				long sample_pos1 = 0, sample_pos2 = wpc.total_samples;
@@ -538,7 +545,7 @@ public class WavPackUtils
 				int file_skip = 0;
 				if (targetSample >= wpc.total_samples)
 					return false;
-				/*if (headerPos > 0 && wps.wphdr.block_samples > 0)
+				if (headerPos > 0 && wps.wphdr.block_samples > 0)
 				{
 					if (wps.wphdr.block_index > targetSample)
 					{
@@ -552,7 +559,7 @@ public class WavPackUtils
 					}
 					else
 						return false;
-				}*/
+				}
 				while (true)
 				{
 					double bytes_per_sample;
@@ -606,7 +613,7 @@ public class WavPackUtils
 						}
 						return true;
 					}
-				}
+				}*/
 			}
 		catch (System.IO.IOException)
 		{
