@@ -483,138 +483,66 @@ public class WavPackUtils
 			if (targetSample >= wpc.total_samples)
 				return false;
 			if (targetSample < 0)
-					targetSample = 0;
+				targetSample = 0;
 
-				var steps = 20;
-				const int min = 5;
+			var steps = 25; // maximum steps to position
+			const int min = 5; // min count of block for seek forward by just read header
 
-				while (steps-- > 0)
+			while (steps-- > 0)
+			{
+				var seek_pos = wps.wphdr.stream_position;
+
+				if (targetSample <= wps.wphdr.block_samples)
+					seek_pos = 0;
+				else if (targetSample < wps.wphdr.block_index || targetSample > wps.wphdr.block_index + wps.wphdr.block_samples)
 				{
-					var seek_pos = wps.wphdr.stream_position;
-
-					if (targetSample <= wps.wphdr.block_samples)
-						seek_pos = 0;
-					else if (targetSample < wps.wphdr.block_index || targetSample > wps.wphdr.block_index + wps.wphdr.block_samples)
-					{
-						// try find pos
-						var distance = targetSample - wps.wphdr.block_index;
-						// align to block, for back with 3 blocks gap for faster search
-						distance += distance > 0 ? (wps.wphdr.block_samples - 1) : (-3 * wps.wphdr.block_samples + 1);
-						var blocks = distance / wps.wphdr.block_samples;
-						// if distance too close just read headers is faster
-						if (blocks > 0 && blocks <= min)
-							seek_pos = -1;
-						else
-							seek_pos += blocks * wps.wphdr.average_block_size;
-					}
-
-					if (seek_pos != -1)
-						infile.BaseStream.Seek(seek_pos, 0);
-
-					wps.wphdr = read_next_header(infile, wps.wphdr);
-
-					if (wps.wphdr.error)
-						return false;
-
-					// if into a block
-					if (targetSample >= wps.wphdr.block_index && targetSample < (wps.wphdr.block_index + wps.wphdr.block_samples))
-					{
-						long index = targetSample - wps.wphdr.block_index;
-						infile.BaseStream.Seek(wps.wphdr.stream_position, 0);
-						WavpackContext c = WavpackOpenFileInput(infile);
-						wpc.stream = c.stream;
-						int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
-						while (index > 0)
-						{
-							long toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
-							toUnpack = WavpackUnpackSamples(wpc, temp_buf, toUnpack);
-							index -= toUnpack;
-						}
-						return true;
-					}
-
-					if (seek_pos == -1)
-						infile.BaseStream.Seek(wps.wphdr.stream_position + wps.wphdr.ckSize, 0);
-				}
-
-				/*
-				long file_pos1 = 0;
-				long file_pos2 = wpc.infile.BaseStream.Length;
-				long sample_pos1 = 0, sample_pos2 = wpc.total_samples;
-				double ratio = 0.96;
-				int file_skip = 0;
-				if (targetSample >= wpc.total_samples)
-					return false;
-				if (headerPos > 0 && wps.wphdr.block_samples > 0)
-				{
-					if (wps.wphdr.block_index > targetSample)
-					{
-						sample_pos2 = wps.wphdr.block_index;
-						file_pos2 = headerPos;
-					}
-					else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
-					{
-						sample_pos1 = wps.wphdr.block_index;
-						file_pos1 = headerPos;
-					}
+					// try find pos
+					var distance = targetSample - wps.wphdr.block_index;
+					// align to block, for back with 3 blocks gap for faster forward search
+					distance += distance > 0 ? (-1 * wps.wphdr.block_samples + 1) : (-2 * wps.wphdr.block_samples + 1);
+					var blocks = distance / wps.wphdr.block_samples;
+					// if distance too close just read headers is faster
+					if (blocks >= 0 && blocks <= min)
+						seek_pos = -1;
 					else
-						return false;
+						seek_pos += blocks * wps.wphdr.average_block_size;
+					if (seek_pos >= infile.BaseStream.Length)
+						seek_pos = -1;
 				}
-				while (true)
-				{
-					double bytes_per_sample;
-					long seek_pos;
-					bytes_per_sample = file_pos2 - file_pos1;
-					bytes_per_sample /= sample_pos2 - sample_pos1;
-					seek_pos = file_pos1 + (file_skip > 0 ? 32 : 0);
-					seek_pos += (long)(bytes_per_sample * (targetSample - sample_pos1) * ratio);
+
+				if (seek_pos != -1)
 					infile.BaseStream.Seek(seek_pos, 0);
 
-					long temppos = infile.BaseStream.Position;
-					wps.wphdr = read_next_header(infile, wps.wphdr);
+				wps.wphdr = read_next_header(infile, wps.wphdr);
 
-					if (wps.wphdr.error || seek_pos >= file_pos2)
+				if (wps.wphdr.error)
+					continue;
+
+				// if into a block
+				if (steps == 0 || targetSample >= wps.wphdr.block_index && targetSample < (wps.wphdr.block_index + wps.wphdr.block_samples))
+				{
+					System.Diagnostics.Debug.WriteLine("Postion find by " + (25 - steps) + " steps");
+					long index = targetSample - wps.wphdr.block_index;
+					infile.BaseStream.Seek(wps.wphdr.stream_position, 0);
+					WavpackContext c = WavpackOpenFileInput(infile);
+					wpc.stream = c.stream;
+					int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
+					while (index > 0)
 					{
-						if (ratio > 0.0)
-						{
-							if ((ratio -= 0.24) < 0.0)
-								ratio = 0.0;
-						}
-						else
-							return false;
+						long toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
+						toUnpack = WavpackUnpackSamples(wpc, temp_buf, toUnpack);
+						index -= toUnpack;
 					}
-					else if (wps.wphdr.block_index > targetSample)
-					{
-						sample_pos2 = wps.wphdr.block_index;
-						file_pos2 = seek_pos;
-					}
-					else if (wps.wphdr.block_index + wps.wphdr.block_samples <= targetSample)
-					{
-						if (seek_pos == file_pos1)
-							file_skip = 1;
-						else
-						{
-							sample_pos1 = wps.wphdr.block_index;
-							file_pos1 = seek_pos;
-						}
-					}
-					else
-					{
-						int index = (int)(targetSample - wps.wphdr.block_index);
-						infile.BaseStream.Seek(seek_pos, 0);
-						WavpackContext c = WavpackOpenFileInput(infile);
-						wpc.stream = c.stream;
-						int[] temp_buf = new int[Defines.SAMPLE_BUFFER_SIZE];
-						while (index > 0)
-						{
-							int toUnpack = Math.Min(index, Defines.SAMPLE_BUFFER_SIZE / WavpackGetReducedChannels(wpc));
-							WavpackUnpackSamples(wpc, temp_buf, toUnpack);
-							index = index - toUnpack;
-						}
-						return true;
-					}
-				}*/
+					return true;
+				}
+
+				if (seek_pos == -1)
+				{
+					infile.BaseStream.Seek(wps.wphdr.stream_position + wps.wphdr.ckSize, 0);
+					steps--; // do not account forward seek by headers
+				}
 			}
+		}
 		catch (System.IO.IOException)
 		{
 		}
