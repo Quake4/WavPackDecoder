@@ -479,7 +479,7 @@ public class WavPackUtils
 		try
 		{
 			WavpackStream wps = wpc.stream;
-			// new positioning
+			/*// new positioning
 			if (targetSample >= wpc.total_samples)
 				return false;
 			if (targetSample < 0)
@@ -529,16 +529,16 @@ public class WavPackUtils
 						return true;
 					}
 				}
-
-				/*
+				*/
+				
 				long file_pos1 = 0;
 				long file_pos2 = wpc.infile.BaseStream.Length;
 				long sample_pos1 = 0, sample_pos2 = wpc.total_samples;
 				double ratio = 0.96;
 				int file_skip = 0;
 				if (targetSample >= wpc.total_samples)
-					return;
-				if (headerPos > 0 && wps.wphdr.block_samples > 0)
+					return false;
+				/*if (headerPos > 0 && wps.wphdr.block_samples > 0)
 				{
 					if (wps.wphdr.block_index > targetSample)
 					{
@@ -551,8 +551,8 @@ public class WavPackUtils
 						file_pos1 = headerPos;
 					}
 					else
-						return;
-				}
+						return false;
+				}*/
 				while (true)
 				{
 					double bytes_per_sample;
@@ -574,7 +574,7 @@ public class WavPackUtils
 								ratio = 0.0;
 						}
 						else
-							return;
+							return false;
 					}
 					else if (wps.wphdr.block_index > targetSample)
 					{
@@ -604,9 +604,9 @@ public class WavPackUtils
 							WavpackUnpackSamples(wpc, temp_buf, toUnpack);
 							index = index - toUnpack;
 						}
-						return;
+						return true;
 					}
-				}*/
+				}
 			}
 		catch (System.IO.IOException)
 		{
@@ -618,10 +618,9 @@ public class WavPackUtils
 	// found and read into the specified pointer. If no WavPack header is found within 1 meg,
 	// then an error is returned. No additional bytes are read past the header. 
 
-	internal static WavpackHeader read_next_header(System.IO.BinaryReader infile, WavpackHeader wphdr)
+	internal static WavpackHeader read_next_header(System.IO.BinaryReader infile, WavpackHeader wphdr, bool forward = true)
 	{
 		byte[] buffer = new byte[32]; // 32 is the size of a WavPack Header
-		byte[] temp = new byte[32];
 
 		long bytes_skipped = 0;
 		int bleft = 0; // bytes left in buffer
@@ -631,15 +630,14 @@ public class WavPackUtils
 		while (true)
 		{
 			for (i = 0; i < bleft; i++)
-			{
 				buffer[i] = buffer[32 - bleft + i];
-			}
 
 			counter = 0;
 
 			try
 			{
-				if (infile.BaseStream.Read(temp, 0, 32 - bleft) != 32 - bleft)
+				var cnt = 32 - bleft;
+				if (infile.BaseStream.Read(buffer, bleft, cnt) != cnt)
 				{
 					wphdr.error = true;
 					return wphdr;
@@ -649,11 +647,6 @@ public class WavPackUtils
 			{
 				wphdr.error = true;
 				return wphdr;
-			}
-
-			for (i = 0; i < 32 - bleft; i++)
-			{
-				buffer[bleft + i] = temp[i];
 			}
 
 			bleft = 32;
