@@ -61,7 +61,8 @@ public class WvDemo
 		System.Console.Out.WriteLine(WavPackUtils.WavpackGetFileFormat(wpc) + " format");
 		System.Console.Out.WriteLine(num_channels + " channels");
 		System.Console.Out.WriteLine(bits + " bits per sample");
-		System.Console.Out.WriteLine(total_samples + " samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
+		System.Console.Out.WriteLine(sample_rate + " samples/s");
+		System.Console.Out.WriteLine(total_samples + " total samples = " + System.TimeSpan.FromTicks(total_samples * 1000 / sample_rate * 10000));
 		System.Console.Out.WriteLine((lossy ? "Lossy" : "Losseless") + " decoding");
 		if (compressionLevel != null)
 			System.Console.Out.WriteLine(compressionLevel + " compression level");
