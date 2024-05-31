@@ -109,6 +109,7 @@
     <Compile Include="BitsUtils.cs" />
     <Compile Include="decorr_pass.cs" />
     <Compile Include="Defines.cs" />
+    <Compile Include="DsdUtils.cs" />
     <Compile Include="entropy_data.cs" />
     <Compile Include="FloatUtils.cs" />
     <Compile Include="MetadataUtils.cs" />

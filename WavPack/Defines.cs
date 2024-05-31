@@ -29,6 +29,8 @@ public class Defines
 	internal const int MONO_FLAG = 4; // not stereo
 	internal const int HYBRID_FLAG = 8; // hybrid mode
 	internal const int FALSE_STEREO = 0x40000000; // block is stereo, but data is mono
+	internal const int MONO_DATA = MONO_FLAG | FALSE_STEREO;
+	internal const uint DSD_FLAG = 0x80000000; // block is encoded DSD (1-bit PCM)
 
 	internal const int SHIFT_LSB = 13;
 	internal const long SHIFT_MASK = (0x1fL << SHIFT_LSB);

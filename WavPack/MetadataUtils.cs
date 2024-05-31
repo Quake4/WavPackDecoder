@@ -161,8 +161,7 @@ class MetadataUtils
 				return UnpackUtils.init_wvx_bitstream(wpc, wpmd);
 
 			case Defines.ID_DSD_BLOCK:
-				//???
-				return Defines.TRUE;
+				return DsdUtils.init_dsd_block(wpc, wpmd);
 
 
 			// ID_OPTIONAL_DATA

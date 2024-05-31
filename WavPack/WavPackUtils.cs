@@ -111,6 +111,11 @@ public class WavPackUtils
 			return wpc;
 		}
 
+		if ((wps.wphdr.flags & Defines.DSD_FLAG) != 0) {
+			wpc.config.bytes_per_sample = 1;
+			wpc.config.bits_per_sample = 8;
+		}
+
 		return wpc;
 	}
 
