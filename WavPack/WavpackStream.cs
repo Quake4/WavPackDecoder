@@ -24,11 +24,11 @@ class WavpackStream
 		internal int byteptr;
 		internal byte[] probabilities;//[256]
 		internal byte[] lookup_buffer;
-		internal byte[][] value_lookup;
+		internal byte[] value_lookup;//256*bins
 		internal byte mode;
 		internal bool ready;
 		internal int history_bins, p0, p1;
-		internal ushort[] summed_probabilities;//256
+		internal ushort[] summed_probabilities;//256*bins
 		internal uint low, high, value;
 		internal DSDfilters[] filters;//2
 		internal int[] ptable;
@@ -52,7 +52,7 @@ class WavpackStream
 	internal words_data w = new words_data();
 
 	internal int num_terms = 0;
-	internal int mute_error;
+	internal bool mute_error;
 	internal int crc, crc_x, crc_mvx;
 	internal long sample_index; // was uint32_t in C
 
