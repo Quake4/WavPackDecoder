@@ -339,7 +339,7 @@ public class WavPackUtils
 	public static long WavpackGetNumSamples(WavpackContext wpc)
 	{
 		// -1 would mean an unknown number of samples
-		return wpc.total_samples;
+		return wpc.dsd_multiplier > 0 ? wpc.total_samples * 8 : wpc.total_samples;
 	}
 
 
@@ -372,7 +372,7 @@ public class WavPackUtils
 	public static long WavpackGetSampleRate(WavpackContext wpc)
 	{
 		if (wpc.config.sample_rate != 0)
-			return wpc.config.sample_rate;
+			return wpc.dsd_multiplier > 0 ? wpc.dsd_multiplier * wpc.config.sample_rate * 8 : wpc.config.sample_rate;
 		else
 			return 44100;
 	}
@@ -402,7 +402,7 @@ public class WavPackUtils
 	public static int WavpackGetBitsPerSample(WavpackContext wpc)
 	{
 		if (wpc.config.bits_per_sample != 0)
-			return wpc.config.bits_per_sample;
+			return wpc.dsd_multiplier > 0 ? wpc.config.bits_per_sample / 8 : wpc.config.bits_per_sample;
 		else
 			return 16;
 	}
