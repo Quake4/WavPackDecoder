@@ -484,8 +484,8 @@ namespace WavPack
 
 				if (stereo)
 				{
-					wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = wps.dsd.filters[1].bytei & 0xFF);
-					wps.dsd.filters[1].factor -= (wps.dsd.filters[1].factor + 512) >> 10;
+					wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = sp[1].bytei & 0xFF);
+					sp[1].factor -= (sp[1].factor + 512) >> 10;
 				}
 			}
 
