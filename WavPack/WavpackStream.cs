@@ -12,10 +12,10 @@ namespace WavPack
 {
 class WavpackStream
 {
-	internal struct DSDfilters
+	internal class DSDfilters
 	{
 		internal int value, filter0, filter1, filter2, filter3, filter4, filter5, filter6, factor;
-		internal uint bytei;
+		internal int bytei;
 	};
 
 	internal struct dsds

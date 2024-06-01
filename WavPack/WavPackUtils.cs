@@ -160,6 +160,9 @@ public class WavPackUtils
 		if ((wpc.config.flags & Defines.CONFIG_EXTRA_MODE) != 0)
 			mode |= Defines.MODE_EXTRA | ((wpc.config.xmode << 12) & Defines.MODE_XMODE);
 
+		if (wpc.dsd_multiplier > 0)
+			mode |= Defines.MODE_DSD;
+
 		return mode;
 	}
 
@@ -282,7 +285,7 @@ public class WavPackUtils
 	// Reformat samples from longs in processor's native endian mode to
 	// little-endian data with (possibly) less than 4 bytes / sample.
 
-	public static bool WavpackFormatSamples(int[] src, long samcnt, int bps, byte[] pcm_buffer, int offset = 0)
+	public static bool WavpackFormatSamples(int[] src, long samcnt, int bps, byte[] pcm_buffer, int offset = 0, bool dsd = false)
 	{
 		int temp;
 		int counter = offset;
@@ -295,8 +298,12 @@ public class WavPackUtils
 		switch (bps)
 		{
 			case 1:
-				while (samcnt-- > 0)
-					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
+				if (dsd)
+					while (samcnt-- > 0)
+						pcm_buffer[counter++] = (byte)src[counter2++];
+				else
+					while (samcnt-- > 0)
+						pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
 				break;
 
 			case 2:
