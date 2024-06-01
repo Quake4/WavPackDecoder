@@ -8,7 +8,6 @@ Public License, v. 2.0. If a copy of the MPL was not distributed
 with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
-
 using System;
 
 namespace WavPack
@@ -254,11 +253,12 @@ namespace WavPack
 			{
 				uint mult, index, i;
 				int code;
+				int p0_index = wps.dsd.p0 * MAX_DSD_BITS_VALUE;
 
-				if (wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + 255] == 0)
+				if (wps.dsd.summed_probabilities[p0_index + 255] == 0)
 					return 0;
 
-				mult = (wps.dsd.high - wps.dsd.low) / wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + 255];
+				mult = (wps.dsd.high - wps.dsd.low) / wps.dsd.summed_probabilities[p0_index + 255];
 
 				if (mult == 0)
 				{
@@ -268,7 +268,7 @@ namespace WavPack
 
 					wps.dsd.low = 0;
 					wps.dsd.high = 0xffffffff;
-					mult = wps.dsd.high / wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + 255];
+					mult = wps.dsd.high / wps.dsd.summed_probabilities[p0_index + 255];
 
 					if (mult == 0)
 						return 0;
@@ -276,13 +276,13 @@ namespace WavPack
 
 				index = (wps.dsd.value - wps.dsd.low) / mult;
 
-				if (index >= wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + 255])
+				if (index >= wps.dsd.summed_probabilities[p0_index + 255])
 					return 0;
 
 				if ((output[bufferStartPos++] = code = wps.dsd.lookup_buffer[wps.dsd.value_lookup[wps.dsd.p0] + index]) > 0)
-					wps.dsd.low += wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + code - 1] * mult;
+					wps.dsd.low += wps.dsd.summed_probabilities[p0_index + code - 1] * mult;
 
-				wps.dsd.high = wps.dsd.low + wps.dsd.probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + code] * mult - 1;
+				wps.dsd.high = wps.dsd.low + wps.dsd.probabilities[p0_index + code] * mult - 1;
 				wps.crc += (wps.crc << 1) + code;
 
 				if ((wps.wphdr.flags & Defines.MONO_DATA) > 0)
@@ -306,7 +306,7 @@ namespace WavPack
 
 
 		const int PTABLE_BITS = 8;
-		const int PTABLE_BINS = (1 << PTABLE_BITS);
+		const int PTABLE_BINS = 1 << PTABLE_BITS;
 		const int PTABLE_MASK = PTABLE_BINS - 1;
 
 		const int UP = 0x010000fe;
