@@ -26,7 +26,6 @@ namespace WavPack
 
 			wps.dsd = new WavpackStream.dsds()
 			{
-				//filters = new WavpackStream.DSDfilters[2],
 				data = wpmd.data,
 			};
 
@@ -169,7 +168,7 @@ namespace WavPack
 
 			max_probability = wps.dsd.data[wps.dsd.byteptr++];
 
-			if (max_probability < 0xff)
+			if (max_probability < 0xFF)
 			{
 				int outptr = 0;
 				int outend = wps.dsd.probabilities.Length;
@@ -236,7 +235,7 @@ namespace WavPack
 				wps.dsd.value = (wps.dsd.value << 8) | wps.dsd.data[wps.dsd.byteptr++];
 
 			wps.dsd.p0 = wps.dsd.p1 = 0;
-			wps.dsd.low = 0; wps.dsd.high = 0xffffffff;
+			wps.dsd.low = 0; wps.dsd.high = 0xFFFFFFFF;
 			wps.dsd.ready = true;
 
 			return Defines.TRUE;
@@ -267,7 +266,7 @@ namespace WavPack
 							wps.dsd.value = (wps.dsd.value << 8) | wps.dsd.data[wps.dsd.byteptr++];
 
 					wps.dsd.low = 0;
-					wps.dsd.high = 0xffffffff;
+					wps.dsd.high = 0xFFFFFFFF;
 					mult = wps.dsd.high / wps.dsd.summed_probabilities[p0_index + 255];
 
 					if (mult == 0)
@@ -293,10 +292,10 @@ namespace WavPack
 					wps.dsd.p1 = code & (wps.dsd.history_bins - 1);
 				}
 
-				while (((wps.dsd.high ^ wps.dsd.low) & 0xff000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
+				while (((wps.dsd.high ^ wps.dsd.low) & 0xFF000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
 				{
 					wps.dsd.value = (wps.dsd.value << 8) | wps.dsd.data[wps.dsd.byteptr++];
-					wps.dsd.high = (wps.dsd.high << 8) | 0xff;
+					wps.dsd.high = (wps.dsd.high << 8) | 0xFF;
 					wps.dsd.low <<= 8;
 				}
 			}
@@ -309,7 +308,7 @@ namespace WavPack
 		const int PTABLE_BINS = 1 << PTABLE_BITS;
 		const int PTABLE_MASK = PTABLE_BINS - 1;
 
-		const int UP = 0x010000fe;
+		const int UP = 0x010000FE;
 		const int DOWN = 0x00010000;
 		const int DECAY = 8;
 
@@ -373,12 +372,12 @@ namespace WavPack
 				sp.filter4 = wps.dsd.data[wps.dsd.byteptr++] << (PRECISION - 8);
 				sp.filter5 = wps.dsd.data[wps.dsd.byteptr++] << (PRECISION - 8);
 				sp.filter6 = 0;
-				sp.factor = wps.dsd.data[wps.dsd.byteptr++] & 0xff;
-				sp.factor |= (wps.dsd.data[wps.dsd.byteptr++] << 8) & 0xff00;
+				sp.factor = wps.dsd.data[wps.dsd.byteptr++];
+				sp.factor |= wps.dsd.data[wps.dsd.byteptr++] << 8;
 				sp.factor = (int)((uint)sp.factor << 16) >> 16;
 			}
 
-			wps.dsd.high = 0xffffffff;
+			wps.dsd.high = 0xFFFFFFFF;
 			wps.dsd.low = 0x0;
 
 			for (i = 4; i > 0; i--)
@@ -422,10 +421,10 @@ namespace WavPack
 						sp[0].filter0 = 0;
 					}
 
-					while (((wps.dsd.high ^ wps.dsd.low) & 0xff000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
+					while (((wps.dsd.high ^ wps.dsd.low) & 0xFF000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
 					{
 						wps.dsd.value = (wps.dsd.value << 8) | wps.dsd.data[wps.dsd.byteptr++];
-						wps.dsd.high = (wps.dsd.high << 8) | 0xff;
+						wps.dsd.high = (wps.dsd.high << 8) | 0xFF;
 						wps.dsd.low <<= 8;
 					}
 
@@ -460,10 +459,10 @@ namespace WavPack
 						sp[1].filter0 = 0;
 					}
 
-					while (((wps.dsd.high ^ wps.dsd.low) & 0xff000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
+					while (((wps.dsd.high ^ wps.dsd.low) & 0xFF000000) == 0 && wps.dsd.byteptr < wps.dsd.data.Length)
 					{
 						wps.dsd.value = (wps.dsd.value << 8) | wps.dsd.data[wps.dsd.byteptr++];
-						wps.dsd.high = (wps.dsd.high << 8) | 0xff;
+						wps.dsd.high = (wps.dsd.high << 8) | 0xFF;
 						wps.dsd.low <<= 8;
 					}
 
@@ -480,12 +479,12 @@ namespace WavPack
 					sp[1].value = sp[1].filter1 - sp[1].filter5 + ((sp[1].filter6 * sp[1].factor) >> 2);
 				}
 
-				wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = sp[0].bytei & 0xff);
+				wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = sp[0].bytei & 0xFF);
 				sp[0].factor -= (sp[0].factor + 512) >> 10;
 
 				if (stereo)
 				{
-					wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = wps.dsd.filters[1].bytei & 0xff);
+					wps.crc += (wps.crc << 1) + (output[bufferStartPos++] = wps.dsd.filters[1].bytei & 0xFF);
 					wps.dsd.filters[1].factor -= (wps.dsd.filters[1].factor + 512) >> 10;
 				}
 			}
