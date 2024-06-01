@@ -163,8 +163,8 @@ namespace WavPack
 
 			wps.dsd.history_bins = 1 << history_bits;
 
-			//wps.dsd.lookup_buffer = new byte[wps.dsd.history_bins * MAX_BYTES_PER_BIN];
-			wps.dsd.value_lookup = new byte[wps.dsd.history_bins * MAX_BYTES_PER_BIN/*MAX_DSD_BITS_VALUE * wps.dsd.history_bins*/];
+			wps.dsd.lookup_buffer = new byte[wps.dsd.history_bins * MAX_BYTES_PER_BIN];
+			wps.dsd.value_lookup = new int[wps.dsd.history_bins];
 			wps.dsd.summed_probabilities = new ushort[MAX_DSD_BITS_VALUE * wps.dsd.history_bins];
 			wps.dsd.probabilities = new byte[MAX_DSD_BITS_VALUE * wps.dsd.history_bins];
 
@@ -203,6 +203,8 @@ namespace WavPack
 			else
 				return Defines.FALSE;
 
+			int lb_ptr = 0;
+
 			for (bi = 0; bi < wps.dsd.history_bins; ++bi)
 			{
 				ushort sum_values;
@@ -216,17 +218,14 @@ namespace WavPack
 					if ((total_summed_probabilities += sum_values) > wps.dsd.history_bins * MAX_BYTES_PER_BIN)
 						return Defines.FALSE;
 
-					var lb_ptr = 0;
-					var lb_index = bi * MAX_BYTES_PER_BIN;
-					//wps.dsd.value_lookup[bi] = wps.dsd.lookup_buffer[lb_ptr];
+					wps.dsd.value_lookup[bi] = lb_ptr;
 
 					for (i = 0; i < MAX_DSD_BITS_VALUE; i++)
 					{
 						int c = wps.dsd.probabilities[bi_index + i];
 
 						while (c-- > 0)
-							//wps.dsd.lookup_buffer[lb_ptr++] = (byte)i;
-							wps.dsd.value_lookup[lb_index + lb_ptr++] = (byte)i;
+							wps.dsd.lookup_buffer[lb_ptr++] = (byte)i;
 					}
 				}
 			}
@@ -280,7 +279,7 @@ namespace WavPack
 				if (index >= wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + 255])
 					return 0;
 
-				if ((output[bufferStartPos++] = code = wps.dsd.value_lookup[wps.dsd.p0 * MAX_DSD_BITS_VALUE + index]) > 0)
+				if ((output[bufferStartPos++] = code = wps.dsd.lookup_buffer[wps.dsd.value_lookup[wps.dsd.p0] + index]) > 0)
 					wps.dsd.low += wps.dsd.summed_probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + code - 1] * mult;
 
 				wps.dsd.high = wps.dsd.low + wps.dsd.probabilities[wps.dsd.p0 * MAX_DSD_BITS_VALUE + code] * mult - 1;

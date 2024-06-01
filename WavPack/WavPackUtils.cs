@@ -336,10 +336,10 @@ public class WavPackUtils
 
 	// Get total number of samples contained in the WavPack file, or -1 if unknown
 
-	public static long WavpackGetNumSamples(WavpackContext wpc)
+	public static long WavpackGetNumSamples(WavpackContext wpc, bool native = false)
 	{
 		// -1 would mean an unknown number of samples
-		return wpc.dsd_multiplier > 0 ? wpc.total_samples * 8 : wpc.total_samples;
+		return native && wpc.dsd_multiplier > 0 ? wpc.total_samples * 8 : wpc.total_samples;
 	}
 
 

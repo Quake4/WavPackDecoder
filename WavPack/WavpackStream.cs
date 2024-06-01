@@ -23,8 +23,8 @@ class WavpackStream
 		internal byte[] data;
 		internal int byteptr;
 		internal byte[] probabilities;//[256]
-		//internal byte[] lookup_buffer;
-		internal byte[] value_lookup;//256*bins
+		internal byte[] lookup_buffer;
+		internal int[] value_lookup;
 		internal byte mode;
 		internal bool ready;
 		internal int history_bins, p0, p1;

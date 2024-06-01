@@ -49,7 +49,7 @@ public class WvDemo
 		int bits = WavPackUtils.WavpackGetBitsPerSample(wpc);
 		int byteps = WavPackUtils.WavpackGetBytesPerSample(wpc);
 		int block_align = byteps * num_channels;
-		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc);
+		long total_samples = WavPackUtils.WavpackGetNumSamples(wpc, true);
 		long sample_rate = WavPackUtils.WavpackGetSampleRate(wpc);
 		var lossy = WavPackUtils.WavpackLossy(wpc);
 		var version = WavPackUtils.WavpackGetVersion(wpc);
