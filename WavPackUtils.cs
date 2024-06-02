@@ -111,6 +111,11 @@ public class WavPackUtils
 			return wpc;
 		}
 
+		if ((wps.wphdr.flags & Defines.DSD_FLAG) != 0) {
+			wpc.config.bytes_per_sample = 1;
+			wpc.config.bits_per_sample = 8;
+		}
+
 		return wpc;
 	}
 
@@ -154,6 +159,9 @@ public class WavPackUtils
 
 		if ((wpc.config.flags & Defines.CONFIG_EXTRA_MODE) != 0)
 			mode |= Defines.MODE_EXTRA | ((wpc.config.xmode << 12) & Defines.MODE_XMODE);
+
+		if (wpc.dsd_multiplier > 0)
+			mode |= Defines.MODE_DSD;
 
 		return mode;
 	}
@@ -247,7 +255,10 @@ public class WavPackUtils
 			if (samples_to_unpack > samples)
 				samples_to_unpack = samples;
 
-			UnpackUtils.unpack_samples(wpc, buffer, samples_to_unpack, buf_idx);
+			if ((wps.wphdr.flags & Defines.DSD_FLAG) > 0)
+				DsdUtils.unpack_dsd_samples(wpc, buffer, samples_to_unpack, buf_idx);
+			else
+				UnpackUtils.unpack_samples(wpc, buffer, samples_to_unpack, buf_idx);
 
 			if (wpc.reduced_channels > 0)
 				bytes_returned = (int)(samples_to_unpack * wpc.reduced_channels);
@@ -274,7 +285,7 @@ public class WavPackUtils
 	// Reformat samples from longs in processor's native endian mode to
 	// little-endian data with (possibly) less than 4 bytes / sample.
 
-	public static bool WavpackFormatSamples(int[] src, long samcnt, int bps, byte[] pcm_buffer, int offset = 0)
+	public static bool WavpackFormatSamples(int[] src, long samcnt, int bps, byte[] pcm_buffer, int offset = 0, bool dsd = false)
 	{
 		int temp;
 		int counter = offset;
@@ -287,8 +298,12 @@ public class WavPackUtils
 		switch (bps)
 		{
 			case 1:
-				while (samcnt-- > 0)
-					pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
+				if (dsd)
+					while (samcnt-- > 0)
+						pcm_buffer[counter++] = (byte)src[counter2++];
+				else
+					while (samcnt-- > 0)
+						pcm_buffer[counter++] = (byte)(0x00FF & (src[counter2++] + 128));
 				break;
 
 			case 2:
@@ -328,10 +343,10 @@ public class WavPackUtils
 
 	// Get total number of samples contained in the WavPack file, or -1 if unknown
 
-	public static long WavpackGetNumSamples(WavpackContext wpc)
+	public static long WavpackGetNumSamples(WavpackContext wpc, bool native = false)
 	{
 		// -1 would mean an unknown number of samples
-		return wpc.total_samples;
+		return native && wpc.dsd_multiplier > 0 ? wpc.total_samples * 8 : wpc.total_samples;
 	}
 
 
@@ -364,7 +379,7 @@ public class WavPackUtils
 	public static long WavpackGetSampleRate(WavpackContext wpc)
 	{
 		if (wpc.config.sample_rate != 0)
-			return wpc.config.sample_rate;
+			return wpc.dsd_multiplier > 0 ? wpc.dsd_multiplier * wpc.config.sample_rate * 8 : wpc.config.sample_rate;
 		else
 			return 44100;
 	}
@@ -394,7 +409,7 @@ public class WavPackUtils
 	public static int WavpackGetBitsPerSample(WavpackContext wpc)
 	{
 		if (wpc.config.bits_per_sample != 0)
-			return wpc.config.bits_per_sample;
+			return wpc.dsd_multiplier > 0 ? wpc.config.bits_per_sample / 8 : wpc.config.bits_per_sample;
 		else
 			return 16;
 	}
@@ -618,10 +633,8 @@ public class WavPackUtils
 			{
 				wphdr.ckSize = (uint)((buffer[7] << 24) | (buffer[6] << 16) | (buffer[5] << 8) | buffer[4]);
 				wphdr.version = (short)((buffer[9] << 8) | buffer[8]);
-				wphdr.track_no = buffer[10];
-				wphdr.index_no = buffer[11];
-				wphdr.total_samples = (uint)((buffer[15] << 24) | (buffer[14] << 16) | (buffer[13] << 8) | buffer[12]);
-				wphdr.block_index = (uint)((buffer[19] << 24) | (buffer[18] << 16) | (buffer[17] << 8) | buffer[16]);
+				wphdr.total_samples = (long)(((ulong)buffer[11] << 32) | ((ulong)buffer[15] << 24) | ((ulong)buffer[14] << 16) | ((ulong)buffer[13] << 8) | buffer[12]);
+				wphdr.block_index = (long)(((ulong)buffer[10] << 32) | ((ulong)buffer[19] << 24) | ((ulong)buffer[18] << 16) | ((ulong)buffer[17] << 8) | buffer[16]);
 				wphdr.block_samples = (uint)((buffer[23] << 24) | (buffer[22] << 16) | (buffer[21] << 8) | buffer[20]);
 				wphdr.flags = (uint)((buffer[27] << 24) | (buffer[26] << 16) | (buffer[25] << 8) | buffer[24]);
 				wphdr.crc = (buffer[31] << 24) | (buffer[30] << 16) | (buffer[29] << 8) | buffer[28];

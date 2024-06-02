@@ -12,14 +12,38 @@ namespace WavPack
 {
 class WavpackStream
 {
+	internal class DSDfilters
+	{
+		internal int value, filter0, filter1, filter2, filter3, filter4, filter5, filter6, factor;
+		internal int bytei;
+	};
+
+	internal struct dsds
+	{
+		internal byte[] data;
+		internal int byteptr;
+		internal byte[] probabilities;//[256]
+		internal byte[] lookup_buffer;
+		internal int[] value_lookup;
+		internal byte mode;
+		internal bool ready;
+		internal int history_bins, p0, p1;
+		internal ushort[] summed_probabilities;//256*bins
+		internal uint low, high, value;
+		internal DSDfilters[] filters;//2
+		internal int[] ptable;
+	};
+
 	public WavpackStream()
 	{
 		InitBlock();
 	}
+
 	private void InitBlock()
 	{
 		decorr_passes = new decorr_pass[] { dp1, dp2, dp3, dp4, dp5, dp6, dp7, dp8, dp9, dp10, dp11, dp12, dp13, dp14, dp15, dp16 };
 	}
+
 	internal WavpackHeader wphdr = new WavpackHeader();
 	internal Bitstream wvbits = new Bitstream();
 	internal Bitstream wvcbits;
@@ -28,7 +52,7 @@ class WavpackStream
 	internal words_data w = new words_data();
 
 	internal int num_terms = 0;
-	internal int mute_error;
+	internal bool mute_error;
 	internal int crc, crc_x, crc_mvx;
 	internal long sample_index; // was uint32_t in C
 
@@ -55,5 +79,8 @@ class WavpackStream
 	internal decorr_pass dp16 = new decorr_pass();
 
 	internal decorr_pass[] decorr_passes;
+
+	// DSD
+	internal dsds dsd;
 }
 }

@@ -32,5 +32,6 @@ public class WavpackContext
 	internal string file_extension = null;
 	internal byte[] header;
 	internal byte[] trailer;
+	internal uint dsd_multiplier;
 }
 }

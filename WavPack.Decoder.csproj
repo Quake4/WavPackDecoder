@@ -7,13 +7,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>WavPack</AssemblyName>
+    <AssemblyName>WavPack.Decoder</AssemblyName>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>false</DelaySign>
-    <OutputType>Library</OutputType>
-    <RootNamespace>WavPack</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>WavPack.Decoder</RootNamespace>
     <NoStandardLibraries>false</NoStandardLibraries>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <FileUpgradeFlags>
@@ -22,7 +22,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ProjectGuid>{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}</ProjectGuid>
+    <ProjectGuid>{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}</ProjectGuid>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetZone>LocalIntranet</TargetZone>
     <ProductVersion>9.0.21022</ProductVersion>
@@ -74,9 +74,6 @@
     <ErrorReport>prompt</ErrorReport>
     <Optimize>True</Optimize>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
       <Name>mscorlib</Name>
@@ -105,23 +102,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Bitstream.cs" />
-    <Compile Include="BitsUtils.cs" />
-    <Compile Include="decorr_pass.cs" />
-    <Compile Include="Defines.cs" />
-    <Compile Include="entropy_data.cs" />
-    <Compile Include="FloatUtils.cs" />
-    <Compile Include="MetadataUtils.cs" />
-    <Compile Include="SupportClass.cs" />
-    <Compile Include="UnpackUtils.cs" />
-    <Compile Include="WavpackConfig.cs" />
-    <Compile Include="WavpackContext.cs" />
-    <Compile Include="WavpackHeader.cs" />
-    <Compile Include="WavpackMetadata.cs" />
-    <Compile Include="WavpackStream.cs" />
-    <Compile Include="WavPackUtils.cs" />
-    <Compile Include="WordsUtils.cs" />
-    <Compile Include="words_data.cs" />
+    <Compile Include="ChunkHeader.cs" />
+    <Compile Include="RiffChunkHeader.cs" />
+    <Compile Include="WaveHeader.cs" />
+    <Compile Include="WvDemo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -158,6 +142,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
+  <Import Project="WavPack.projitems" Label="Shared" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

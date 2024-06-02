@@ -14,8 +14,8 @@ class WavpackHeader
 {
 	internal uint ckSize;
 	internal short version;
-	internal byte track_no, index_no;
-	internal uint total_samples, block_index, block_samples, flags;
+	internal long total_samples, block_index;
+	internal uint block_samples, flags;
 	internal int crc;
 	internal bool error; // means error
 	internal long stream_position;

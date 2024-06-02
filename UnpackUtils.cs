@@ -29,7 +29,7 @@ class UnpackUtils
 		if (wps.wphdr.block_samples > 0 && wps.wphdr.block_index != 0xFFFFFFFF)
 			wps.sample_index = wps.wphdr.block_index;
 
-		wps.mute_error = 0;
+		wps.mute_error = false;
 		wps.crc = wps.crc_x = -1;
 		wps.wvbits.sr = 0;
 
@@ -48,7 +48,7 @@ class UnpackUtils
 			return Defines.FALSE;
 		}
 
-		if (wps.wphdr.block_samples != 0 && (wps.wvbits == null || wps.wvbits.end == 0))
+		if (wps.wphdr.block_samples != 0 && (wps.wphdr.flags & Defines.DSD_FLAG) > 0 ? !wps.dsd.ready : (wps.wvbits == null || wps.wvbits.end == 0))
 		{
 			wpc.error_message = "invalid WavPack file";
 			return Defines.FALSE;
@@ -524,9 +524,8 @@ class UnpackUtils
 		if (wps.sample_index + sample_count > wps.wphdr.block_index + wps.wphdr.block_samples)
 			sample_count = wps.wphdr.block_index + wps.wphdr.block_samples - wps.sample_index;
 
-		if (wps.mute_error > 0)
+		if (wps.mute_error)
 		{
-
 			long tempc;
 
 			if ((flags & Defines.MONO_FLAG) > 0)
@@ -660,7 +659,7 @@ class UnpackUtils
 			while (sc-- > 0)
 				buffer[buffer_counter++] = 0;
 
-			wps.mute_error = 1;
+			wps.mute_error = true;
 			i = sample_count;
 		}
 
