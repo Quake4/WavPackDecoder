@@ -142,12 +142,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WavPack\WavPack.csproj">
-      <Project>{d17b1db1-7e0f-43ef-be21-68feb449ab39}</Project>
-      <Name>WavPack</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\WavPack\WavPack.projitems" Label="Shared" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

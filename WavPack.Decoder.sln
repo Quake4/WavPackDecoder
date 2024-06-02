@@ -5,13 +5,13 @@ VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavPack.Decoder", "WavPack.Decoder\WavPack.Decoder.csproj", "{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WavPack", "WavPack\WavPack.csproj", "{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{8D2AB270-4E1C-484B-9A29-8CBB975DFD81}"
 	ProjectSection(SolutionItems) = preProject
 		license.txt = license.txt
 		readme.txt = readme.txt
 	EndProjectSection
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WavPack", "WavPack\WavPack.shproj", "{C2266309-73BC-48B9-B2B0-87FB63DC1F22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,15 +23,15 @@ Global
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04F62C81-761F-4906-9C0A-B56FDC5AA1BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D17B1DB1-7E0F-43EF-BE21-68FEB449AB39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66209B1A-1F7D-46E8-B286-EB90AD631C58}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		WavPack\WavPack.projitems*{04f62c81-761f-4906-9c0a-b56fdc5aa1bf}*SharedItemsImports = 4
+		WavPack\WavPack.projitems*{c2266309-73bc-48b9-b2b0-87fb63dc1f22}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

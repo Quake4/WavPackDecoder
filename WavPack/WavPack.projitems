@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>c2266309-73bc-48b9-b2b0-87fb63dc1f22</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>WavPack</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Bitstream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BitsUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)decorr_pass.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Defines.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DsdUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)entropy_data.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MetadataUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SupportClass.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnpackUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavpackConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavpackContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavpackHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavpackMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavpackStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WavPackUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WordsUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)words_data.cs" />
+  </ItemGroup>
+</Project>
