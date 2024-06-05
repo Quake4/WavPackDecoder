@@ -105,7 +105,7 @@ public class WavPackUtils
 				wpc.reduced_channels = 2;
 		}
 
-		if (wpc.config.num_channels > 2)
+		if ((flags & Defines.OPEN_2CH_MAX) == 0 && wpc.config.num_channels > 2)
 		{
 			wpc.error_message = "only two channels supported!";
 			return wpc;

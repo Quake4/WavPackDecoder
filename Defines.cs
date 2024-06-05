@@ -23,7 +23,7 @@ public class Defines
 	internal const int TRUE = 1;
 
 	// or-values for "flags"
-	internal const byte OPEN_2CH_MAX = 0x8; // open multichannel as stereo (no downmix)
+	public const byte OPEN_2CH_MAX = 0x8; // open multichannel as stereo (no downmix)
 
 	internal const int BYTES_STORED = 3; // 1-4 bytes/sample
 	internal const int MONO_FLAG = 4; // not stereo
