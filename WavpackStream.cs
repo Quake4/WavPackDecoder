@@ -4,8 +4,8 @@
 ** Copyright (c) 2010-2016 Peter McQuillan
 **
 ** All Rights Reserved.
-**                       
-** Distributed under the BSD Software License (see license.txt)  
+**
+** Distributed under the BSD Software License (see license.txt)
 ***/
 
 namespace WavPack
@@ -18,7 +18,7 @@ class WavpackStream
 		internal int bytei;
 	};
 
-	internal struct dsds
+	internal struct Dsds
 	{
 		internal byte[] data;
 		internal int byteptr;
@@ -81,6 +81,6 @@ class WavpackStream
 	internal decorr_pass[] decorr_passes;
 
 	// DSD
-	internal dsds dsd;
+	internal Dsds dsd;
 }
 }
