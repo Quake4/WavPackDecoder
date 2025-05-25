@@ -4,8 +4,8 @@
 ** Copyright (c) 2010-2016 Peter McQuillan
 **
 ** All Rights Reserved.
-**                       
-** Distributed under the BSD Software License (see license.txt)  
+**
+** Distributed under the BSD Software License (see license.txt)
 ***/
 
 namespace WavPack
@@ -79,15 +79,12 @@ class BitsUtils
 
 		if (passed != 0)
 		{
-			bs.ptr = (short)(bs.end - 1);
+			bs.ptr = bs.end - 1/*passed???*/;
 			bs.file_bytes = file_bytes;
 			bs.file = file;
 		}
 		else
-		{
-			bs.buf_index--;
-			bs.ptr = -1;
-		}
+			bs.ptr = bs.buf_index = -1;
 
 		return bs;
 	}
@@ -117,7 +114,7 @@ class BitsUtils
 
 			if (bytes_read > 0)
 			{
-				bs.end = (short)(bytes_read);
+				bs.end = bytes_read;
 				bs.file_bytes -= bytes_read;
 			}
 			else
