@@ -24,7 +24,7 @@ namespace WavPack
 			if (!wpmd.copy_data())
 				return Defines.FALSE;
 
-			wps.dsd = new WavpackStream.dsds()
+			wps.dsd = new WavpackStream.Dsds()
 			{
 				data = wpmd.data,
 			};
